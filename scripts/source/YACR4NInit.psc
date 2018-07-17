@@ -5,7 +5,8 @@ Event OnInit()
 		YACR4N.Start()
 		YACR4NSearch.Start()
 	endif
-	self.Stop()
+	; self.Stop()
+	; this is the initializer AND Quest Reload Manager
 EndEvent
 
 Quest Property YACR4N  Auto  

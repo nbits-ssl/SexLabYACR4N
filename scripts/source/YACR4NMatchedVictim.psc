@@ -8,10 +8,10 @@ Event OnCombatStateChanged(Actor akTarget, int aeCombatState)
 		return
 	endif
 	
-	if (aeCombatState == 1 && victim.IsInFaction(YACR4NActiveFaction) && \
+	if (aeCombatState == 1 && !victim.IsInFaction(YACR4NActiveFaction) && \
 		akTarget != Game.GetPlayer() && !akTarget.IsPlayerTeammate())
 		
-		mainScript.FillAlias(self.GetActorRef())
+		mainScript.FillAlias(victim)
 	endif
 EndEvent
 
