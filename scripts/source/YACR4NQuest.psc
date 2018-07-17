@@ -7,18 +7,17 @@ bool Function FillAlias(Actor act)
 	AppUtil.Log("Try FillAlias() " + actName)
 	
 	int i = Victims.Length
-	bool filled
-	Actor tmpact
+	
 	while i > 0
 		i -= 1
-		tmpact = Victims[i].GetActorRef()
-		if (!tmpact)
-			filled = Victims[i].ForceRefIfEmpty(act)
-			if (filled)
-				i = -1
-			endif
+		if (Victims[i].ForceRefIfEmpty(act))
+			AppUtil.Log("Filled main alias " + actName)
+			return true
 		endif
 	endwhile
+	
+	AppUtil.Log("Failed to fill main alias " + actName)
+	return false
 EndFunction
 
 ReferenceAlias[] Property Victims  Auto  

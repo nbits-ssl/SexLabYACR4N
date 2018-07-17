@@ -1,18 +1,15 @@
 Scriptname YACR4NMatchedVictim extends ReferenceAlias  
 
-YACR4N Property mainScript  Auto  
-
 Event OnCombatStateChanged(Actor akTarget, int aeCombatState)
-	Actor victim = self.GetActorRef()
-	if (!victim)
-		return
-	endif
+	Actor vic = self.GetActorRef()
 	
-	if (aeCombatState == 1 && !victim.IsInFaction(YACR4NActiveFaction) && \
-		akTarget != Game.GetPlayer() && !akTarget.IsPlayerTeammate())
+	if (aeCombatState == 1 && \
+		vic != None && !vic.IsInFaction(YACR4NActiveFaction) && \
+		akTarget != None && akTarget != Game.GetPlayer() && !akTarget.IsPlayerTeammate())
 		
-		mainScript.FillAlias(victim)
+		(YACR4N as YACR4NQuest).FillAlias(vic)
 	endif
 EndEvent
 
+Quest Property YACR4N  Auto  
 Faction Property YACR4NActiveFaction  Auto  
