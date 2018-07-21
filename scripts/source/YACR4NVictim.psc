@@ -400,6 +400,12 @@ EndEvent
 Event OnCellDetach()
 	; EndSexEvent is usually runned by OnCellDetach(), but this is papyrus. 2nd check.
 	self._endSexVictim()
+	Utility.Wait(1.5) ; for clearing OnUpdate wait
+	self.Clear()
+EndEvent
+
+Event OnDeath(Actor akKiller)
+	self.Clear()
 EndEvent
 
 

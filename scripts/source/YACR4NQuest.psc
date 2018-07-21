@@ -6,14 +6,15 @@ bool Function FillAlias(Actor act)
 	string actName = act.GetActorBase().GetName()
 	AppUtil.Log("Try FillAlias() " + actName)
 	
-	int i = Victims.Length
+	int i = 0
+	int len = Victims.Length
 	
-	while i > 0
-		i -= 1
+	while (i < len)
 		if (Victims[i].ForceRefIfEmpty(act))
 			AppUtil.Log("Filled main alias " + actName)
 			return true
 		endif
+		i += 1
 	endwhile
 	
 	AppUtil.Log("Failed to fill main alias " + actName)
