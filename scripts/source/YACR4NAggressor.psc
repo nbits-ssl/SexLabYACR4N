@@ -61,7 +61,7 @@ Event OnDeath(Actor akKiller)
 EndEvent
 
 Event OnCellDetach()
-	self.GetActorRef().SetGhost(false)
+	self.Clear()
 EndEvent
 
 SexLabFramework Property SexLab  Auto 

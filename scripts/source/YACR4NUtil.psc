@@ -1,7 +1,7 @@
 Scriptname YACR4NUtil extends Quest  
 
 int Function GetVersion()
-	return 20180715
+	return 20180722
 EndFunction
 
 Function Log(String msg)
@@ -78,7 +78,7 @@ bool Function ValidateAggr(Actor victim, Actor aggr, int cfg)
 EndFunction
 
 Function CleanFlyingDeadBody(Actor act)
-	if (act.IsDead())
+	if (act && act.IsDead())
 		ObjectReference wobj = act as ObjectReference
 		wobj.SetPosition(wobj.GetPositionX(), wobj.GetPositionY() + 10.0, wobj.GetPositionZ())
 		debug.sendAnimationEvent(wobj, "ragdoll")

@@ -58,20 +58,14 @@ State Busy
 EndState
 
 Function _readySexVictim()
-	Actor act = self.GetActorRef()
-	act.SetGhost(true)
-	VictimAlias.ForceRefTo(act)
-	
-	act.StopCombat()
-	act.StopCombatAlarm()
+	VictimAlias.ForceRefTo(self.GetActorRef())
 EndFunction
 
 Function _endSexVictim()
-	Actor act = self.GetActorRef()
+	AppUtil.Log("_endSexVictim() " + HookName)
 	
 	self._clearAudience()
 	VictimAlias.Clear()
-	act.SetGhost(false)
 	
 	RegisterForSingleUpdate(0.5) ; for Unregist ForceUpdateController
 EndFunction
@@ -93,7 +87,9 @@ Function doSex(Actor aggr)
 		AppUtil.Log("ghosted Actor found, pass doSex " + SelfName)
 		aggr.RemoveFromFaction(YACR4NActionFaction) ; from OnEnterBleedOut
 		return
-	elseif (Aggressor.GetActorRef() || aggr.IsDead() || !aggr.Is3DLoaded() || aggr.IsDisabled())
+	elseif (Aggressor.GetActorRef() || aggr.IsDead() || !aggr.Is3DLoaded() || aggr.IsDisabled() || \
+			victim.IsDead() || !victim.Is3DLoaded() || victim.IsDisabled())
+			
 		AppUtil.Log("already filled ref, dead actor, or not loaded, pass doSex " + SelfName)
 		aggr.RemoveFromFaction(YACR4NActionFaction) ; from OnEnterBleedOut
 		return
@@ -114,6 +110,7 @@ Function doSex(Actor aggr)
 		sslBaseAnimation[] anims = AppUtil.BuildAnimation(sexActors)
 		
 		AppUtil.Log("run SexLab " + SelfName)
+		
 		int tid = self._quickSex(sexActors, anims, victim = victim)
 		sslThreadController controller = SexLab.GetController(tid)
 		AppUtil.Log("run SexLab [" + tid + "] " + SelfName)
@@ -316,7 +313,7 @@ EndEvent
 
 ; from rapespell, genius!
 Event OnUpdate()
-	AppUtil.Log("# OnUpdate YACRPlayer " + SelfName)
+	AppUtil.Log("# OnUpdate YACR4NVictim " + SelfName)
 	if (UpdateController && UpdateController.GetState() == "animating")
 		AppUtil.Log("OnUpdate, UpdateController is alive " + SelfName)
 		UpdateController.OnUpdate()
@@ -397,14 +394,13 @@ Event OnCombatStateChanged(Actor akTarget, int aeCombatState)
 	endif
 EndEvent
 
-Event OnCellDetach()
-	; EndSexEvent is usually runned by OnCellDetach(), but this is papyrus. 2nd check.
-	self._endSexVictim()
-	Utility.Wait(1.5) ; for clearing OnUpdate wait
-	self.Clear()
-EndEvent
+;Event OnCellDetach()
+;	 EndSexEvent is runned by OnCellDetach() by SexLab, leave it to SexLab (Not Original YACR)
+;EndEvent
 
 Event OnDeath(Actor akKiller)
+	Aggressor.Clear()
+	self._clearHelpers()
 	self.Clear()
 EndEvent
 
