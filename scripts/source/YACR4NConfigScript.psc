@@ -2,6 +2,7 @@ Scriptname YACR4NConfigScript extends SKI_ConfigBase
 
 bool Property modEnabled = true Auto
 bool Property debugLogFlag = false Auto
+int Property updatePeriod = 15 Auto
 
 bool Property enableEndlessRape = true Auto
 int Property rapeChance = 100 Auto
@@ -15,6 +16,7 @@ Bool[] Property DisableRacesConfig  Auto
 
 int enableDisableID
 int debugLogFlagID
+int updatePeriodID
 
 int enableEndlessRapeID
 int rapeChanceID
@@ -65,13 +67,21 @@ Event OnPageReset(string page)
 		SetCursorPosition(0)
 		AddHeaderOption("$YACR4N_GeneralConfig")
 
+		updatePeriodID = AddSliderOption("$YACR4N_UpdatePeriod", updatePeriod)
+
+		AddEmptyOption()
+
+		matchedSexID = AddMenuOption("$YACR4N_MatchedSex", matchedSexList[matchedSex])
 		healthLimitID = AddSliderOption("$YACR4N_HealthLimit", healthLimit)
 		rapeChanceID = AddSliderOption("$YACR4N_RapeChance", rapeChance)
 		enableEndlessRapeID = AddToggleOption("$YACR4N_EndlessRape", enableEndlessRape)
-		matchedSexID = AddMenuOption("$YACR4N_MatchedSex", matchedSexList[matchedSex])
+		
+		AddEmptyOption()
 	
 		enableDrippingWASupportID = AddToggleOption("$YACR4N_EnableDrippingWASupport", enableDrippingWASupport)
 		debugLogFlagID = AddToggleOption("$YACR4N_OutputPapyrusLog", debugLogFlag)
+		
+		AddEmptyOption()
 		
 		SetCursorPosition(1)
 		AddHeaderOption("$YACR4N_DisableEnemyRaces")
@@ -126,11 +136,15 @@ Event OnOptionHighlight(int option)
 	elseif (option == rapeChanceID)
 		SetInfoText("$YACR4N_RapeChanceInfo")
 	elseif (option == enableEndlessRapeID)
-		SetInfoText("$YACR4N_EndlessRape")
+		SetInfoText("$YACR4N_EndlessRapeInfo")
 	elseif (option == matchedSexID)
-		SetInfoText("$YACR4N_MatchedSex")
+		SetInfoText("$YACR4N_MatchedSexInfo")
 	elseif (option == enableDrippingWASupportID)
-		SetInfoText("$YACR4N_EnableDrippingWASupport")
+		SetInfoText("$YACR4N_EnableDrippingWASupportInfo")
+	elseif (option == updatePeriodID)
+		SetInfoText("$YACR4N_UpdatePeriodInfo")
+	elseif (disableEnemyRacesIDS.Find(option) > -1)
+		SetInfoText("$YACR4N_DisableEnemyRacesInfo")
 	endif
 EndEvent
 
@@ -158,6 +172,10 @@ Event OnOptionSliderOpen(int option)
 		self._setSliderDialogWithPercentage(healthLimit)
 	elseif (option == rapeChanceID)
 		self._setSliderDialogWithPercentage(rapeChance)
+	elseif (option == updatePeriodID)
+		SetSliderDialogDefaultValue(15)
+		SetSliderDialogRange(5, 240)
+		SetSliderDialogInterval(1)
 	endif
 EndEvent
 
@@ -176,6 +194,9 @@ Event OnOptionSliderAccept(int option, float value)
 	elseif (option == rapeChanceID)
 		rapeChance = value as int
 		SetSliderOptionValue(option, rapeChance)
+	elseif (option == updatePeriodID)
+		updatePeriod = value as int
+		SetSliderOptionValue(option, updatePeriod)
 	endif
 EndEvent
 

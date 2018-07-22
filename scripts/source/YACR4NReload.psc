@@ -11,7 +11,7 @@ EndEvent
 Event OnUpdate()
 	; AppUtil.Log("#### Quest Reload start")
 	self._reload()
-	RegisterForSingleUpdate(10)
+	RegisterForSingleUpdate(Config.updatePeriod)
 	AppUtil.Log("#### Quest Reload done")
 EndEvent
 

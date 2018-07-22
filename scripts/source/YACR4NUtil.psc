@@ -5,10 +5,10 @@ int Function GetVersion()
 EndFunction
 
 Function Log(String msg)
-	bool debugflag = true
+	; bool debugflag = true
 	; bool debugflag = false
 
-	if (debugflag)
+	if (Config.debugLogFlag)
 		debug.trace("[yacr4n] " + msg)
 	endif
 EndFunction
@@ -252,8 +252,8 @@ int Function ArrayCount(Actor[] myArray)
 EndFunction
 
 
-YACR4NConfigScript Property Config Auto
 SexLabFramework Property SexLab  Auto
+YACR4NConfigScript Property Config Auto
 
 Keyword Property ActorTypeNPC  Auto  
 Faction Property SprigganFaction  Auto  
