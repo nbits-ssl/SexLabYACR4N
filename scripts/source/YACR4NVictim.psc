@@ -11,7 +11,7 @@ Event OnHit(ObjectReference akAggressor, Form akSource, Projectile akProjectile,
 
 	Actor akAggr = akAggressor as Actor
 	Actor selfact = self.GetActorRef()
-	SelfName = selfact.GetActorBase().GetName()
+	SelfName = selfact.GetLeveledActorBase().GetName()
 	Weapon wpn = akSource as Weapon
 	
 	if (akAggressor == None || akProjectile || PreSource ==  akSource || !wpn || \
@@ -81,7 +81,7 @@ EndFunction
 
 Function doSex(Actor aggr)
 	Actor victim = self.GetActorRef()
-	SelfName = victim.GetActorBase().GetName()
+	SelfName = victim.GetLeveledActorBase().GetName()
 	
 	if (victim.IsGhost() || aggr.IsGhost())
 		AppUtil.Log("ghosted Actor found, pass doSex " + SelfName)

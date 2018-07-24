@@ -7,7 +7,7 @@ Event OnHit(ObjectReference akAggressor, Form akSource, Projectile akProjectile,
 	
 	Actor selfact = self.GetActorRef()
 	if (selfact)
-		SelfName = selfact.GetActorBase().GetName()
+		SelfName = selfact.GetLeveledActorBase().GetName()
 	endif
 	
 	Spell spl = akSource as Spell
@@ -52,17 +52,19 @@ Event OnDying(Actor akKiller)
 	ObjectReference wobj = self.GetActorRef() as ObjectReference
 	wobj.SetPosition(wobj.GetPositionX(), wobj.GetPositionY() + 10.0, wobj.GetPositionZ())
 	debug.sendAnimationEvent(wobj, "ragdoll")
-	AppUtil.Log("enemy OnDying, sendAnimationEvent " + self.GetActorRef().GetActorBase().GetName())
+	AppUtil.Log("enemy OnDying, sendAnimationEvent " + self.GetActorRef().GetLeveledActorBase().GetName())
 EndEvent
 
 Event OnDeath(Actor akKiller)
-	AppUtil.Log("enemy OnDeath, Clear " + self.GetActorRef().GetActorBase().GetName())
+	AppUtil.Log("enemy OnDeath, Clear " + self.GetActorRef().GetLeveledActorBase().GetName())
 	self.Clear()
 EndEvent
 
-Event OnCellDetach()
-	self.Clear()
-EndEvent
+;Event OnCellDetach()
+;	self.Clear()
+	; EndSexEvent is runned by OnCellDetach() by SexLab, leave it to SexLab & Victim
+;EndEvent
+
 
 SexLabFramework Property SexLab  Auto 
 YACR4NUtil Property AppUtil Auto

@@ -102,13 +102,15 @@ Event OnPageReset(string page)
 		Actor act
 		ReferenceAlias ref
 		int n = 0
+		int idx = 1
 		int len = MatchedAlias.Length
 		
 		while n != len
 			ref = MatchedAlias[n]
 			act = ref.GetActorRef()
 			if (act)
-				AddTextOption(n + 1 + ". " + act.GetActorBase().GetName(), "")
+				AddTextOption(idx + ". " + act.GetLeveledActorBase().GetName(), "")
+				idx += 1
 			endif
 			n += 1
 		endWhile
@@ -117,13 +119,15 @@ Event OnPageReset(string page)
 		AddHeaderOption("$YACR4N_ActionNPC")
 		
 		n = 0
+		idx = 1
 		len = YACR4NScript.Victims.Length
 		
 		while n != len
 			ref = YACR4NScript.Victims[n]
 			act = ref.GetActorRef()
 			if (act)
-				AddTextOption(n + 1 + ". " + act.GetActorBase().GetName(), "")
+				AddTextOption(idx + ". " + act.GetLeveledActorBase().GetName(), "")
+				idx += 1
 			endif
 			n += 1
 		endWhile
