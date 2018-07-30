@@ -9,23 +9,23 @@ sslThreadController UpdateController
 
 Event OnHit(ObjectReference akAggressor, Form akSource, Projectile akProjectile, bool abPowerAttack, bool abSneakAttack, bool abBashAttack, bool abHitBlocked)
 
-	Actor akAggr = akAggressor as Actor
 	Actor selfact = self.GetActorRef()
 	SelfName = selfact.GetLeveledActorBase().GetName()
-	Weapon wpn = akSource as Weapon
 	
-	if (akAggressor == None || akProjectile || PreSource ==  akSource || !wpn || \
-		selfact.IsGhost() || selfact.IsDead() || akAggr.IsPlayerTeammate() || akAggr == PlayerActor || \
-		selfact.IsInKillMove() || akAggr.IsInKillMove() || (wpn == Unarmed && selfact.GetDistance(akAggr) > 150.0))
-		
-		AppUtil.Log("not if " + SelfName)
+	if (akAggressor == None || akProjectile || PreSource ==  akSource)
 		return
 	endif
 	
 	GotoState("Busy")
 	PreSource = akSource
+	Actor akAggr = akAggressor as Actor
+	Weapon wpn = akSource as Weapon
 	
-	if (!abHitBlocked && wpn.GetWeaponType() < 7) ; exclude Bow/Staff/Crossbow
+	if (!wpn || selfact.IsGhost() || selfact.IsDead() || akAggr.IsPlayerTeammate() || akAggr == PlayerActor || \
+		selfact.IsInKillMove() || akAggr.IsInKillMove() || (wpn == Unarmed && selfact.GetDistance(akAggr) > 150.0))
+		
+		; do nothing & not return for state
+	elseif (!abHitBlocked && wpn.GetWeaponType() < 7) ; exclude Bow/Staff/Crossbow
 		AppUtil.Log("onhit success " + SelfName)
 		float healthper = selfact.GetAVPercentage("health") * 100
 		
@@ -126,6 +126,7 @@ Function doSex(Actor aggr)
 			; self._endSexAggr(aggr)
 			aggr.SetGhost(false) ; _endSexAggr()
 			AppUtil.Log("aggr setghost disable " + SelfName)
+			MarkerQuest.Track(HookName, victim, aggr)
 		else
 			AppUtil.Log("###FIXME### controller not found, recover setup " + SelfName)
 			self.EndSexEvent(aggr)
@@ -236,6 +237,14 @@ Event StageStartEventYACR(int tid, bool HasPlayer)
 	AppUtil.Log("StageStartEvent: " + SelfName)
 	Actor selfact = self.GetActorRef()
 	Actor aggr = Aggressor.GetActorRef()
+	
+	if (selfact.GetAV("health") <= 0)
+		AppUtil.Log("StageStartEvent stop, already victim is dead : " + SelfName)
+		self.EndSexEvent(aggr)
+	elseif (!selfact || !aggr)
+		AppUtil.Log("##FIXME## StageStartEvent stop, none victim or none aggr : " + SelfName)
+		self.EndSexEvent(aggr)
+	endif
 	
 	UnregisterForUpdate()
 	self._getAudience()
@@ -366,7 +375,8 @@ Function EndSexEvent(Actor aggr)
 		self._cleanDeadBody(Helper1)
 		self._cleanDeadBody(Helper2)
 		self._cleanDeadBody(Helper3)
-
+		
+		MarkerQuest.Clear(HookName)
 		Aggressor.Clear()
 		self._clearHelpers()
 		
@@ -399,6 +409,9 @@ EndEvent
 ;EndEvent
 
 Event OnDeath(Actor akKiller)
+	AppUtil.Log("### OnDeath, clear aliases " + SelfName)
+	self._endSexVictim()
+	MarkerQuest.Clear(HookName)
 	Aggressor.Clear()
 	self._clearHelpers()
 	self.Clear()
@@ -407,7 +420,9 @@ EndEvent
 
 YACR4NConfigScript Property Config Auto
 YACR4NUtil Property AppUtil Auto
+YACR4NMarkerScript Property MarkerQuest Auto
 SexLabFramework Property SexLab  Auto
+
 Faction property SSLAnimatingFaction Auto
 Faction property YACR4NActionFaction Auto
 Actor Property PlayerActor  Auto

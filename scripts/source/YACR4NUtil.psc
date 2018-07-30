@@ -51,7 +51,7 @@ int Function _validateCreature(Actor ActorRef)  ; from ActorLib.ValidateActor
 EndFunction
 
 bool Function ValidateAggr(Actor victim, Actor aggr, int cfg)
-	string SelfName = victim.GetActorBase().GetName()
+	string SelfName = victim.GetLeveledActorBase().GetName()
 	
 	if (aggr.HasKeyWord(ActorTypeNPC))
 		return self._validateSex(victim, aggr, cfg)

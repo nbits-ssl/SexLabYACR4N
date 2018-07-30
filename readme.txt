@@ -53,11 +53,6 @@ SexLab Yet Another Combat Rape(SexLab YACR)のNPC版。
 * Skyrim SexLab 1.62
 
 
-## 併用推奨(好みに応じて)
-
-SL Peeping TomなどSex開始を通知してくれるMod
-
-
 ## 製作環境で関係ありそうなModや設定
 
 * SexLab基本設定"Disable Starting Teleport"をOFFに
@@ -95,6 +90,7 @@ SaveTool.exeなどをその後にかけるとより安全です。
 * SexLab Defeat
 * SexLab RapeSpell
 * Skyrim Battle Test Area
+* SL Peeping Tom
 * bbspink Skyrim エロMod晒しスレ
 * R18なModなので具体名は挙げませんが国内Modderの皆さま
 
