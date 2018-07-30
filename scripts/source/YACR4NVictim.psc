@@ -238,14 +238,6 @@ Event StageStartEventYACR(int tid, bool HasPlayer)
 	Actor selfact = self.GetActorRef()
 	Actor aggr = Aggressor.GetActorRef()
 	
-	if (selfact.GetAV("health") <= 0)
-		AppUtil.Log("StageStartEvent stop, already victim is dead : " + SelfName)
-		self.EndSexEvent(aggr)
-	elseif (!selfact || !aggr)
-		AppUtil.Log("##FIXME## StageStartEvent stop, none victim or none aggr : " + SelfName)
-		self.EndSexEvent(aggr)
-	endif
-	
 	UnregisterForUpdate()
 	self._getAudience()
 	UpdateController = SexLab.GetController(tid)
