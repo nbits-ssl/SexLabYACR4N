@@ -10,7 +10,7 @@ sslThreadController UpdateController
 Event OnHit(ObjectReference akAggressor, Form akSource, Projectile akProjectile, bool abPowerAttack, bool abSneakAttack, bool abBashAttack, bool abHitBlocked)
 
 	Actor selfact = self.GetActorRef()
-	SelfName = selfact.GetLeveledActorBase().GetName()
+	SelfName = selfact.GetLeveledActorBase().GetName() + " " + selfact.GetFormID()
 	
 	if (akAggressor == None || akProjectile || PreSource ==  akSource)
 		return
@@ -85,17 +85,13 @@ Function doSex(Actor aggr)
 	
 	if (victim.IsGhost() || aggr.IsGhost())
 		AppUtil.Log("ghosted Actor found, pass doSex " + SelfName)
-		aggr.RemoveFromFaction(YACR4NActionFaction) ; from OnEnterBleedOut
 		return
-	elseif (Aggressor.GetActorRef() || aggr.IsDead() || !aggr.Is3DLoaded() || aggr.IsDisabled() || \
-			victim.IsDead() || !victim.Is3DLoaded() || victim.IsDisabled())
+	elseif (Aggressor.GetActorRef() || \
+			aggr.IsDead() || !aggr.Is3DLoaded() || aggr.IsDisabled() || aggr.IsInKillMove() || \
+			victim.IsDead() || !victim.Is3DLoaded() || victim.IsDisabled() || victim.IsInKillMove() || \
+			victim.HasKeyWordString("SexLabActive") || aggr.IsInFaction(YACR4NActionFaction))
 			
-		AppUtil.Log("already filled ref, dead actor, or not loaded, pass doSex " + SelfName)
-		aggr.RemoveFromFaction(YACR4NActionFaction) ; from OnEnterBleedOut
-		return
-	elseif (victim.IsInFaction(SSLAnimatingFaction)) ; second check
-		AppUtil.Log("victim already animating, pass doSex " + SelfName)
-		aggr.RemoveFromFaction(YACR4NActionFaction) ; from OnEnterBleedOut
+		AppUtil.Log("already filled ref, dead actor, not loaded, or already animation (second check), pass doSex " + SelfName)
 		return
 	elseif (!AppUtil.ValidateAggr(victim, aggr, Config.matchedSex))
 		return
@@ -145,6 +141,7 @@ Function doSexLoop()
 	int helpersCount = actors.Length - 2
 	
 	AppUtil.Log("LOOPING run SexLab aggr " + aggr + ", helpers count " + helpersCount)
+	AppUtil.Log("LOOPING actors: " + actors)
 	
 	sslBaseAnimation[] anims = AppUtil.BuildAnimation(actors)
 	int tid = self._quickSex(actors, anims, victim = victim, CenterOn = aggr)
@@ -237,8 +234,14 @@ Event StageStartEventYACR(int tid, bool HasPlayer)
 	AppUtil.Log("StageStartEvent: " + SelfName)
 	Actor selfact = self.GetActorRef()
 	Actor aggr = Aggressor.GetActorRef()
-	
 	UnregisterForUpdate()
+	
+	if (selfact.IsDead()) ; almost happen by killmove
+		AppUtil.Log("StageStartEvent, victim already has dead, stop " + SelfName)
+		self.EndSexEvent(aggr)
+		return
+	endif
+	
 	self._getAudience()
 	UpdateController = SexLab.GetController(tid)
 	sslThreadController controller = UpdateController
@@ -260,7 +263,7 @@ Event StageStartEventYACR(int tid, bool HasPlayer)
 	endif
 	
 	if (controller.Stage == stagecnt && Config.enableEndlessRape)
-		AppUtil.Log("endless sex loop... " + SelfName)
+		AppUtil.Log("endless sex loop: " + SelfName)
 		int rndint = Utility.RandomInt()
 		
 		selfact.SetGhost(false)
@@ -289,7 +292,7 @@ Event StageStartEventYACR(int tid, bool HasPlayer)
 			bool multiplayLimit = false
 			int origLength = controller.Positions.Length
 			Actor[] actors = AppUtil.GetHelpersCombined(selfact, aggr)
-			AppUtil.Log("endless sex loop... actors are " + actors)
+			AppUtil.Log("endless sex loop...actors are " + actors)
 			
 			if (origLength == 5 || origLength == actors.Length)
 				multiplayLimit = true
