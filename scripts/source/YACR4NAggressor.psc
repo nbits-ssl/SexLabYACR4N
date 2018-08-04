@@ -48,6 +48,14 @@ State Busy
 	EndEvent
 EndState
 
+;Event OnPackageChange(Package akOldPackage)
+;	Actor selfact = self.GetActorRef()
+;	
+;	if (selfact.HasKeyWordString("SexLabActive"))
+;		AppUtil.Log("### OnPackageChange " + akOldPackage)
+;	endif
+;EndEvent
+
 Event OnDying(Actor akKiller)
 	ObjectReference wobj = self.GetActorRef() as ObjectReference
 	wobj.SetPosition(wobj.GetPositionX(), wobj.GetPositionY() + 10.0, wobj.GetPositionZ())
