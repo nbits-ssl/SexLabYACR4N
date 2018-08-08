@@ -1,7 +1,7 @@
 Scriptname YACR4NUtil extends Quest  
 
 int Function GetVersion()
-	return 20180722
+	return 20180801
 EndFunction
 
 Function Log(String msg)
@@ -85,22 +85,37 @@ Function CleanFlyingDeadBody(Actor act)
 	endif
 EndFunction
 
-Actor[] Function GetHelpersCombined(Actor victim, Actor aggr)
-	Actor[] actors
-	Quest searcherQuest
-	ReferenceAlias mainAggr
+bool Function GetHelperSearcherLock(Actor aggr)
+	Quest searcherQuest = self._getSearcherQuest(aggr)
 	
-	if (aggr.HasKeyWord(ActorTypeNPC))
-		searcherQuest = YACR4NHelperHumanSearcher
+	if (searcherQuest.IsRunning())
+		self.Log("GetHelperSearcherLock(): failed")
+		return false
 	else
-		searcherQuest = YACR4NHelperCreatureSearcher
+		self.Log("GetHelperSearcherLock(): success")
+		searcherQuest.Start()
+		return true
 	endif
-	mainAggr = YACR4NHelperMainAggr
+EndFunction
+
+Function ReleaseHelperSearcherLock(Actor aggr)
+	self.Log("ReleaseHelperSearcherLock()")
+	self._getSearcherQuest(aggr).Stop()
+EndFunction
+
+Actor[] Function GetHelpersCombined(Actor victim, Actor aggr)
+	YACR4NHelperMainAggr.ForceRefTo(aggr)
+	Quest searcherQuest = self._getSearcherQuest(aggr)
 	
-	mainAggr.ForceRefTo(aggr)
-	actors = self._getHelpersCombined(victim, aggr, searcherQuest)
-	
-	return actors
+	return self._getHelpersCombined(victim, aggr, searcherQuest)
+EndFunction
+
+Quest Function _getSearcherQuest(Actor aggr)
+	if (aggr.HasKeyWord(ActorTypeNPC))
+		return YACR4NHelperHumanSearcher
+	else
+		return YACR4NHelperCreatureSearcher
+	endif
 EndFunction
 
 Actor[] Function _getHelpersCombined(Actor victim, Actor aggr, Quest qst)
@@ -109,11 +124,9 @@ Actor[] Function _getHelpersCombined(Actor victim, Actor aggr, Quest qst)
 	sslBaseAnimation[] anims
 	int idx = 0
 
-	if (!qst.IsRunning())
-		qst.Start()
-		tmpArray = (qst as YACR4NHelperSearch).Gather()
-		qst.Stop()
-	endif
+	; qst.IsRunning by QuestLock
+	
+	tmpArray = (qst as YACR4NHelperSearch).Gather()
 	ArraySort(tmpArray)
 	idx = ArrayCount(tmpArray)
 	

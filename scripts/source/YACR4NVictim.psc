@@ -10,7 +10,7 @@ sslThreadController UpdateController
 Event OnHit(ObjectReference akAggressor, Form akSource, Projectile akProjectile, bool abPowerAttack, bool abSneakAttack, bool abBashAttack, bool abHitBlocked)
 
 	Actor selfact = self.GetActorRef()
-	SelfName = selfact.GetLeveledActorBase().GetName() + " " + selfact.GetFormID()
+	SelfName = selfact.GetLeveledActorBase().GetName()
 	
 	if (akAggressor == None || akProjectile || PreSource ==  akSource)
 		return
@@ -83,17 +83,7 @@ Function doSex(Actor aggr)
 	Actor victim = self.GetActorRef()
 	SelfName = victim.GetLeveledActorBase().GetName()
 	
-	if (victim.IsGhost() || aggr.IsGhost())
-		AppUtil.Log("ghosted Actor found, pass doSex " + SelfName)
-		return
-	elseif (Aggressor.GetActorRef() || \
-			aggr.IsDead() || !aggr.Is3DLoaded() || aggr.IsDisabled() || aggr.IsInKillMove() || \
-			victim.IsDead() || !victim.Is3DLoaded() || victim.IsDisabled() || victim.IsInKillMove() || \
-			victim.HasKeyWordString("SexLabActive") || aggr.IsInFaction(YACR4NActionFaction))
-			
-		AppUtil.Log("already filled ref, dead actor, not loaded, or already animation (second check), pass doSex " + SelfName)
-		return
-	elseif (!AppUtil.ValidateAggr(victim, aggr, Config.matchedSex))
+	if (self._isValidActors(victim, aggr))
 		return
 	endif
 	
@@ -132,16 +122,44 @@ Function doSex(Actor aggr)
 	endif
 EndFunction
 
+bool Function _isValidActors(Actor victim, Actor aggr)
+	if (victim.IsGhost() || aggr.IsGhost())
+		AppUtil.Log("ghosted Actor found, pass doSex " + SelfName)
+		return false
+	elseif (Aggressor.GetActorRef() || \
+			aggr.IsDead() || !aggr.Is3DLoaded() || aggr.IsDisabled() || aggr.IsInKillMove() || \
+			victim.IsDead() || !victim.Is3DLoaded() || victim.IsDisabled() || victim.IsInKillMove() || \
+			victim.HasKeyWordString("SexLabActive") || aggr.IsInFaction(YACR4NActionFaction))
+			
+		AppUtil.Log("already filled ref, dead actor, not loaded, or already animation (second check), pass doSex " + SelfName)
+		return false
+	elseif (!AppUtil.ValidateAggr(victim, aggr, Config.matchedSex))
+		return false
+	endif
+	
+	return true
+EndFunction
+
 Function doSexLoop()
+	Actor[] actors
 	Actor aggr = Aggressor.GetActorRef()
 	Actor victim = self.GetActorRef()
+	bool locked = AppUtil.GetHelperSearcherLock(aggr)
 	
-	Actor[] actors = AppUtil.GetHelpersCombined(victim, aggr)
-	self._forceRefHelpers(actors)
-	int helpersCount = actors.Length - 2
-	
-	AppUtil.Log("LOOPING run SexLab aggr " + aggr + ", helpers count " + helpersCount)
-	AppUtil.Log("LOOPING actors: " + actors)
+	if (locked)
+		actors = AppUtil.GetHelpersCombined(victim, aggr)
+		self._forceRefHelpers(actors)
+		int helpersCount = actors.Length - 2
+		
+		AppUtil.Log("LOOPING run SexLab aggr " + aggr + ", helpers count " + helpersCount)
+		AppUtil.Log("LOOPING actors: " + actors)
+	else
+		actors = new Actor[2]
+		actors[0] = victim
+		actors[1] = aggr
+		
+		AppUtil.Log("LOOPING run SexLab aggr " + aggr + ", none helpers (can't get lock)")
+	endif
 	
 	sslBaseAnimation[] anims = AppUtil.BuildAnimation(actors)
 	int tid = self._quickSex(actors, anims, victim = victim, CenterOn = aggr)
@@ -169,6 +187,10 @@ Function doSexLoop()
 	else
 		AppUtil.Log("LOOPING ###FIXME### controller not found, recover setup " + SelfName)
 		self.EndSexEvent(aggr)
+	endif
+	
+	if (locked)
+		AppUtil.ReleaseHelperSearcherLock(aggr)
 	endif
 EndFunction
 
@@ -246,8 +268,7 @@ Event StageStartEventYACR(int tid, bool HasPlayer)
 	UpdateController = SexLab.GetController(tid)
 	sslThreadController controller = UpdateController
 	int stagecnt = controller.Animation.StageCount
-	int cumid = controller.Animation.GetCum(0)
-
+	
 	if (Config.enableDrippingWASupport)
 		if (controller.Stage >= stagecnt - 1)
 			selfact.SetGhost(false)
@@ -263,61 +284,88 @@ Event StageStartEventYACR(int tid, bool HasPlayer)
 	endif
 	
 	if (controller.Stage == stagecnt && Config.enableEndlessRape)
-		AppUtil.Log("endless sex loop: " + SelfName)
-		int rndint = Utility.RandomInt()
-		
-		selfact.SetGhost(false)
-		SexLab.ActorLib.ApplyCum(controller.Positions[0], cumid)
-		if (!Config.enableDrippingWASupport)
-			selfact.SetGhost(true)
-		endif
-		
-		controller.UnregisterForUpdate()
-		float laststagewait = SexLab.Config.StageTimerAggr[4]
-		if (laststagewait > 1)
-			Utility.Wait(laststagewait - 1.5) 
-		endif
-		if !(Aggressor.GetActorRef())  ; already escape because some reason 
-			return
-		endif
-		
-		if (rndint < 5) ; 20%
-			AppUtil.Log("endless sex loop...one more " + SelfName)
-			controller.AdvanceStage(true) ; has self controller.onUpdate
-		elseif (rndint < 10) ; 25%
-			AppUtil.Log("endless sex loop...one more from 2nd " + SelfName)
-			controller.GoToStage(stagecnt - 2) ; has self controller.onUpdate
-			RegisterForSingleUpdate(ForceUpdatePeriod)
-		else
-			bool multiplayLimit = false
-			int origLength = controller.Positions.Length
-			Actor[] actors = AppUtil.GetHelpersCombined(selfact, aggr)
-			AppUtil.Log("endless sex loop...actors are " + actors)
-			
-			if (origLength == 5 || origLength == actors.Length)
-				multiplayLimit = true
-			endif
-			
-			if (!multiplayLimit && rndint < 90 && (AppUtil.ArrayCount(actors) - 2) > 0) ; 30%
-				AppUtil.Log("endless sex loop...change to Multiplay " + SelfName)
-				EndlessSexLoop = true
-				controller.RegisterForSingleUpdate(0.2)
-			else ; 25%
-				AppUtil.Log("endless sex loop...change anim " + SelfName)
-				controller.ChangeAnimation() ; has self controller.onUpdate
-				controller.Stage = 2
-				controller.Action("Advancing")
-				RegisterForSingleUpdate(ForceUpdatePeriod)
-			endif
-		endif
-		; thank you obachan
-		; GetHelpersCombined() is heavy, when test with 40 npcs sometimes 1.5sec is too short time.
+		self._sexLoop(selfact, aggr, controller)
 	endif
 EndEvent
 
+Function _sexLoop(Actor victim, Actor aggr, sslThreadController controller)
+	AppUtil.Log("endless sex loop: " + SelfName)
+	
+	victim.SetGhost(false)
+	SexLab.ActorLib.ApplyCum(controller.Positions[0], controller.Animation.GetCum(0))
+	if (!Config.enableDrippingWASupport)
+		victim.SetGhost(true)
+	endif
+	
+	controller.UnregisterForUpdate()
+	float laststagewait = SexLab.Config.StageTimerAggr[4]
+	if (laststagewait > 1)
+		Utility.Wait(laststagewait - 1.5) 
+	endif
+	if !(Aggressor.GetActorRef())  ; already escape because some reason 
+		return ; no handling, leave it to SexLab
+	endif
+	
+	int rndint = Utility.RandomInt()
+	
+	if (rndint < 10) ; 10%
+		self._sexLoopOneMore(controller)
+	elseif (rndint < 20) ; 20%
+		self._sexLoopOneMoreFromSecond(controller)
+	else
+		int origLength = controller.Positions.Length
+		bool locked = AppUtil.GetHelperSearcherLock(aggr)
+			
+		if (origLength != 5 && locked)
+			Actor[] actors = AppUtil.GetHelpersCombined(victim, aggr)
+			AppUtil.Log("endless sex loop...actors are " + actors)
+			
+			if (origLength != actors.Length && rndint < 90 && (AppUtil.ArrayCount(actors) - 2) > 0)
+				self._sexLoopSendToMultiplay(controller)
+			else
+				self._sexLoopChangeAnim(controller)
+			endif
+		else
+			self._sexLoopChangeAnim(controller)
+		endif
+		
+		if (locked)
+			AppUtil.ReleaseHelperSearcherLock(aggr)
+		endif
+	endif
+	; GetHelpersCombined() is heavy, when test with 40 npcs sometimes 1.5sec is too short time.
+EndFunction
+
+Function _sexLoopOneMore(sslThreadController controller)
+	AppUtil.Log("endless sex loop...one more " + SelfName)
+	controller.AdvanceStage(true) ; has self controller.onUpdate
+EndFunction
+
+Function _sexLoopOneMoreFromSecond(sslThreadController controller)
+	AppUtil.Log("endless sex loop...one more from 2nd " + SelfName)
+	int stagecnt = controller.Animation.StageCount
+	controller.GoToStage(stagecnt - 2) ; has self controller.onUpdate
+	RegisterForSingleUpdate(ForceUpdatePeriod)
+EndFunction
+
+Function _sexLoopChangeAnim(sslThreadController controller) ; thank you obachan
+	AppUtil.Log("endless sex loop...change anim " + SelfName)
+	controller.ChangeAnimation() ; has self controller.onUpdate
+	controller.Stage = 2
+	controller.Action("Advancing")
+	RegisterForSingleUpdate(ForceUpdatePeriod)
+EndFunction
+
+Function _sexLoopSendToMultiplay(sslThreadController controller)
+	AppUtil.Log("endless sex loop...change to Multiplay " + SelfName)
+	EndlessSexLoop = true
+	controller.RegisterForSingleUpdate(0.2) ; finish current sex
+EndFunction
+
+
 ; from rapespell, genius!
 Event OnUpdate()
-	AppUtil.Log("# OnUpdate YACR4NVictim " + SelfName)
+	; AppUtil.Log("# OnUpdate YACR4NVictim " + SelfName)
 	if (UpdateController && UpdateController.GetState() == "animating")
 		AppUtil.Log("OnUpdate, UpdateController is alive " + SelfName)
 		UpdateController.OnUpdate()
