@@ -223,6 +223,7 @@ int function _quickSex(Actor[] Positions, sslBaseAnimation[] Anims, Actor Victim
 	Thread.SetAnimations(Anims)
 	Thread.DisableBedUse(true)
 	Thread.DisableLeadIn()
+	Thread.DisableRagdollEnd()
 	Thread.CenterOnObject(CenterOn)
 	
 	Thread.SetHook("YACR4N" + HookName)
