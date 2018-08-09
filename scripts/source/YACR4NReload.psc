@@ -9,10 +9,11 @@ Event OnCellLoad()
 EndEvent
 
 Event OnUpdate()
-	; AppUtil.Log("#### Quest Reload start")
-	self._reload()
+	if (Config.modEnabled)
+		self._reload()
+		AppUtil.Log("#### Quest Reload done")
+	endif
 	RegisterForSingleUpdate(Config.updatePeriod)
-	AppUtil.Log("#### Quest Reload done")
 EndEvent
 
 Function _reload()

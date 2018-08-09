@@ -173,6 +173,8 @@ Event OnOptionHighlight(int option)
 		SetInfoText("$YACR4N_UpdatePeriodInfo")
 	elseif (option == searchDistanceID)
 		SetInfoText("$YACR4N_SearchDistanceInfo")
+	elseif (option == modEnabledID)
+		SetInfoText("$YACR4N_ModEnabledInfo")
 	elseif (disableEnemyRacesIDS.Find(option) > -1)
 		SetInfoText("$YACR4N_DisableEnemyRacesInfo")
 	endif
@@ -191,6 +193,8 @@ Event OnOptionSelect(int option)
 	elseif (option == modEnabledID)
 		modEnabled = !modEnabled
 		SetToggleOptionValue(option, modEnabled)
+		(YACR4NQuestManager as YACR4NInit).Toggle(modEnabled)
+		
 	elseif (option == markerEnabledID)
 		markerEnabled = !markerEnabled
 		SetToggleOptionValue(option, markerEnabled)
