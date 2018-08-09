@@ -83,7 +83,7 @@ Function doSex(Actor aggr)
 	Actor victim = self.GetActorRef()
 	SelfName = victim.GetLeveledActorBase().GetName()
 	
-	if (self._isValidActors(victim, aggr))
+	if (!self._isValidActors(victim, aggr))
 		return
 	endif
 	
@@ -404,7 +404,7 @@ EndEvent
 
 Function EndSexEvent(Actor aggr)
 	Actor selfact = self.GetActorRef()
-	if (EndlessSexLoop)
+	if (EndlessSexLoop && PlayerActor.GetDistance(selfact) < YACR4NDistance.GetValue())
 		AppUtil.Log("EndSexEvent, Goto to loop " + SelfName)
 		EndlessSexLoop = false
 		self._clearHelpers()
@@ -465,6 +465,7 @@ YACR4NConfigScript Property Config Auto
 YACR4NUtil Property AppUtil Auto
 YACR4NMarkerScript Property MarkerQuest Auto
 SexLabFramework Property SexLab  Auto
+GlobalVariable Property YACR4NDistance  Auto  
 
 Faction property SSLAnimatingFaction Auto
 Faction property YACR4NActionFaction Auto
@@ -480,3 +481,4 @@ ReferenceAlias Property Helper3  Auto
 Keyword Property ActorTypeNPC  Auto  
 WEAPON Property Unarmed  Auto  
 Quest Property AudienceQuest Auto
+

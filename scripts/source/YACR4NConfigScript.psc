@@ -1,6 +1,7 @@
 Scriptname YACR4NConfigScript extends SKI_ConfigBase  
 
 bool Property modEnabled = true Auto
+bool Property markerEnabled = false Auto
 bool Property debugLogFlag = false Auto
 int Property updatePeriod = 15 Auto
 
@@ -14,9 +15,12 @@ bool Property enableDrippingWASupport = false Auto
 Race[] Property DisableRaces  Auto  
 Bool[] Property DisableRacesConfig  Auto  
 
-int enableDisableID
+int modEnabledID
+int markerEnabledID
+
 int debugLogFlagID
 int updatePeriodID
+int searchDistanceID
 
 int enableEndlessRapeID
 int rapeChanceID
@@ -68,6 +72,7 @@ Event OnPageReset(string page)
 		AddHeaderOption("$YACR4N_GeneralConfig")
 
 		updatePeriodID = AddSliderOption("$YACR4N_UpdatePeriod", updatePeriod)
+		searchDistanceID = AddSliderOption("$YACR4N_SearchDistance", YACR4NDistance.GetValue() as int)
 
 		AddEmptyOption()
 
@@ -79,18 +84,25 @@ Event OnPageReset(string page)
 		AddEmptyOption()
 	
 		enableDrippingWASupportID = AddToggleOption("$YACR4N_EnableDrippingWASupport", enableDrippingWASupport)
-		debugLogFlagID = AddToggleOption("$YACR4N_OutputPapyrusLog", debugLogFlag)
 		
 		AddEmptyOption()
 		
 		SetCursorPosition(1)
+		AddHeaderOption("$YACR4N_System")
+		
+		modEnabledID = AddToggleOption("$YACR4N_ModEnabled", modEnabled)
+		markerEnabledID = AddToggleOption("$YACR4N_MarkerEnabled", markerEnabled)
+		debugLogFlagID = AddToggleOption("$YACR4N_OutputPapyrusLog", debugLogFlag)
+		
+		AddEmptyOption()
+		
 		AddHeaderOption("$YACR4N_DisableEnemyRaces")
 		
 		int len = DisableRaces.Length
 		int idx = 0
 		string raceName
 		while idx != len
-			raceName = DisableRaces[idx].GetName()
+			raceName = self.getRaceName(DisableRaces[idx])
 			disableEnemyRacesIDS[idx] = AddToggleOption(raceName, DisableRacesConfig[idx])
 			idx += 1
 		endwhile
@@ -134,6 +146,18 @@ Event OnPageReset(string page)
 	endif
 EndEvent
 
+string Function getRaceName(Race srace)
+	if (srace == DragonRace)
+		return "$YACR4N_DragonRaceName"
+	elseif (srace == DLC1VampireBeastRace)
+		return "$YACR4N_VampireLoadRaceName"
+	elseif (srace == AlduinRace)
+		return "$YACR4N_AlduinRaceName"
+	endif
+
+	return srace.GetName()
+EndFunction
+
 Event OnOptionHighlight(int option)
 	if (option == healthLimitID)
 		SetInfoText("$YACR4N_HealthLimitInfo")
@@ -147,6 +171,8 @@ Event OnOptionHighlight(int option)
 		SetInfoText("$YACR4N_EnableDrippingWASupportInfo")
 	elseif (option == updatePeriodID)
 		SetInfoText("$YACR4N_UpdatePeriodInfo")
+	elseif (option == searchDistanceID)
+		SetInfoText("$YACR4N_SearchDistanceInfo")
 	elseif (disableEnemyRacesIDS.Find(option) > -1)
 		SetInfoText("$YACR4N_DisableEnemyRacesInfo")
 	endif
@@ -154,14 +180,21 @@ EndEvent
 
 Event OnOptionSelect(int option)
 	if (option == enableEndlessRapeID)
-		enableEndlessRape = ! enableEndlessRape
+		enableEndlessRape = !enableEndlessRape
 		SetToggleOptionValue(option, enableEndlessRape)
 	elseif (option == enableDrippingWASupportID)
-		enableDrippingWASupport = ! enableDrippingWASupport
+		enableDrippingWASupport = !enableDrippingWASupport
 		SetToggleOptionValue(option, enableDrippingWASupport)
 	elseif (option == debugLogFlagID)
-		debugLogFlag = ! debugLogFlag
+		debugLogFlag = !debugLogFlag
 		SetToggleOptionValue(option, debugLogFlag)
+	elseif (option == modEnabledID)
+		modEnabled = !modEnabled
+		SetToggleOptionValue(option, modEnabled)
+	elseif (option == markerEnabledID)
+		markerEnabled = !markerEnabled
+		SetToggleOptionValue(option, markerEnabled)
+		YACR4NMarkerQuestScript.Toggle(markerEnabled)
 		
 	elseif (disableEnemyRacesIDS.Find(option) > -1)
 		int idx = disableEnemyRacesIDS.Find(option)
@@ -177,16 +210,20 @@ Event OnOptionSliderOpen(int option)
 	elseif (option == rapeChanceID)
 		self._setSliderDialogWithPercentage(rapeChance)
 	elseif (option == updatePeriodID)
+		SetSliderDialogStartValue(updatePeriod)
 		SetSliderDialogDefaultValue(15)
 		SetSliderDialogRange(5, 240)
 		SetSliderDialogInterval(1)
+	elseif (option == searchDistanceID)
+		SetSliderDialogStartValue(YACR4NDistance.GetValue())
+		SetSliderDialogDefaultValue(20000)
+		SetSliderDialogRange(1000, 60000)
+		SetSliderDialogInterval(500)
 	endif
 EndEvent
 
 Function _setSliderDialogWithPercentage(int x)
 	SetSliderDialogStartValue(x)
-	SetSliderDialogDefaultValue(x)
-	
 	SetSliderDialogRange(0.0, 100.0)
 	SetSliderDialogInterval(1.0)
 EndFunction
@@ -194,14 +231,14 @@ EndFunction
 Event OnOptionSliderAccept(int option, float value)
 	if (option == healthLimitID)
 		healthLimit = value as int
-		SetSliderOptionValue(option, healthLimit)
 	elseif (option == rapeChanceID)
 		rapeChance = value as int
-		SetSliderOptionValue(option, rapeChance)
 	elseif (option == updatePeriodID)
 		updatePeriod = value as int
-		SetSliderOptionValue(option, updatePeriod)
+	elseif (option == searchDistanceID)
+		YACR4NDistance.SetValue(value as int)
 	endif
+	SetSliderOptionValue(option, value as int)
 EndEvent
 
 event OnOptionMenuOpen(int option)
@@ -222,5 +259,12 @@ endEvent
 
 
 YACR4NQuest Property YACR4NScript  Auto 
+YACR4NMarkerScript Property YACR4NMarkerQuestScript  Auto 
 Quest Property YACR4NQuestManager  Auto
 ReferenceAlias[] Property MatchedAlias  Auto  
+GlobalVariable Property YACR4NDistance  Auto  
+
+Race Property DragonRace  Auto  
+Race Property DLC1VampireBeastRace  Auto  
+Race Property AlduinRace  Auto  
+

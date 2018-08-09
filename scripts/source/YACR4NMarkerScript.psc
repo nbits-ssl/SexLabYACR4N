@@ -39,6 +39,20 @@ Function Clear(string hookName)
 	endif
 EndFunction
 
+Function Toggle(bool enabled)
+	if (enabled)
+		self.Start()
+	else
+		int len = HookNameList.Length
+		while len
+			len -= 1
+			self.Clear(HookNameList[len])
+		endwhile
+		self.SetObjectiveDisplayed(0, false)
+		self.Stop()
+	endif
+EndFunction
+
 
 YACR4NUtil Property AppUtil Auto
 
