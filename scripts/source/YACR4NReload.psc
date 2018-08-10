@@ -11,7 +11,7 @@ EndEvent
 Event OnUpdate()
 	if (Config.modEnabled)
 		self._reload()
-		AppUtil.Log("#### Quest Reload done")
+		AppUtil.Log("# Quest Reload done")
 	endif
 	RegisterForSingleUpdate(Config.updatePeriod)
 EndEvent
@@ -20,7 +20,7 @@ Function _reload()
 	if (cellreload)
 		YACR4N.Stop()
 		YACR4N.Start()
-		AppUtil.Log("###### Main Quest Reload done")
+		AppUtil.Log("# Main Quest Reload done")
 		cellreload = false
 		Utility.Wait(0.5)
 	endif

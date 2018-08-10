@@ -18,12 +18,12 @@ SexLab Yet Another Combat Rape(SexLab YACR)のNPC版。
   「だいたいの場合は横槍が入る」ことを想定して機能は実装しています。
 * オリジナルのYACRから、「ブリードアウト状態になった時にレイプを引き寄
   せる機能」「はやしたて」などを削除しています。
+* 男フォロワーが敵女NPCを襲います(MCMで設定可)。
 
 * PCがいるセルの女性NPCを捕捉し、戦闘状態に入ったらYACRの機能を有効に
   します。PCがセルを離れると行為を停止させ、機能を外します。
 * 捕捉されているNPC/機能が有効になっているNPCはMCMから見ることができ
   ます。
-
 * 行為発生感知用の専用マーカークエストを持っています(デフォルトオフ)
 
 
@@ -61,6 +61,7 @@ SexLab Yet Another Combat Rape(SexLab YACR)のNPC版。
 
 * Skyrim OE + Dawnguard + Dragonborn
 * Skyrim SexLab 1.62
+* SexLab Aroused Redux
 
 
 ## 製作環境で関係ありそうなModや設定
@@ -90,9 +91,6 @@ SexLab Yet Another Combat Rape(SexLab YACR)のNPC版。
 ンストールしてください。
 SaveTool.exeなどをその後にかけるとより安全です。
 
-  stopquest yacr4n
-  stopquest yacr4nsearch
-
 
 ## 謝辞
 
@@ -108,7 +106,7 @@ SaveTool.exeなどをその後にかけるとより安全です。
 
 ## 更新履歴
 
-### 2018/07/** - 1.0alpha1
+### 2018/09/0* - 1.0alpha1
 
 * 初回リリース
 

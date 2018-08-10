@@ -21,10 +21,10 @@ Event OnHit(ObjectReference akAggressor, Form akSource, Projectile akProjectile,
 	Actor akAggr = akAggressor as Actor
 	Weapon wpn = akSource as Weapon
 	
-	if (!wpn || selfact.IsGhost() || selfact.IsDead() || akAggr.IsPlayerTeammate() || akAggr == PlayerActor || \
+	if (!wpn || selfact.IsGhost() || selfact.IsDead() || akAggr == PlayerActor || \
 		selfact.IsInKillMove() || akAggr.IsInKillMove() || (wpn == Unarmed && selfact.GetDistance(akAggr) > 150.0))
 		
-		; do nothing & not return for state
+		; do nothing & not return
 	elseif (!abHitBlocked && wpn.GetWeaponType() < 7) ; exclude Bow/Staff/Crossbow
 		AppUtil.Log("onhit success " + SelfName)
 		float healthper = selfact.GetAVPercentage("health") * 100
@@ -39,6 +39,12 @@ Event OnHit(ObjectReference akAggressor, Form akSource, Projectile akProjectile,
 				selfact.RemoveFromFaction(SSLAnimatingFaction)
 				; ##FIXME## Instead ActorLib.ValidateActor ?
 			endif
+		elseif (akAggr.IsPlayerTeammate() && healthper < Config.healthLimitFollower && \
+				Utility.RandomInt() as float < self._getFollowersRapeChance(akAggr))
+			
+			AppUtil.Log("doSex(follower) " + SelfName)
+			self.doSex(akAggr)
+			
 		elseif (healthper < Config.healthLimit && Utility.RandomInt() < Config.rapeChance)
 			AppUtil.Log("doSex " + SelfName)
 			self.doSex(akAggr)
@@ -49,6 +55,15 @@ Event OnHit(ObjectReference akAggressor, Form akSource, Projectile akProjectile,
 	PreSource = None
 	GotoState("")
 EndEvent
+
+float Function _getFollowersRapeChance(Actor aggr)
+	float rapeChance = Config.rapeChanceFollower as float
+	if (Config.linkArousal)
+		return rapeChance / 100.0 * AppUtil.GetArousal(aggr) as float
+	else
+		return rapeChance
+	endif
+EndFunction
 
 State Busy
 	Event OnHit(ObjectReference akAggressor, Form akSource, Projectile akProjectile, bool abPowerAttack, bool abSneakAttack, bool abBashAttack, bool abHitBlocked)
@@ -284,19 +299,25 @@ Event StageStartEventYACR(int tid, bool HasPlayer)
 		AppUtil.Log("###FIXME### Onhit missing de-ghost " + SelfName)
 	endif
 	
-	if (controller.Stage == stagecnt && Config.enableEndlessRape)
-		self._sexLoop(selfact, aggr, controller)
+	if (controller.Stage == stagecnt)
+		self._applyCum(selfact, controller)
+		
+		if (Config.enableEndlessRape && !aggr.IsPlayerTeammate())
+			self._sexLoop(selfact, aggr, controller)
+		endif
 	endif
 EndEvent
 
-Function _sexLoop(Actor victim, Actor aggr, sslThreadController controller)
-	AppUtil.Log("endless sex loop: " + SelfName)
-	
+Function _applyCum(Actor victim, sslThreadController controller)
 	victim.SetGhost(false)
 	SexLab.ActorLib.ApplyCum(controller.Positions[0], controller.Animation.GetCum(0))
 	if (!Config.enableDrippingWASupport)
 		victim.SetGhost(true)
 	endif
+EndFunction
+
+Function _sexLoop(Actor victim, Actor aggr, sslThreadController controller)
+	AppUtil.Log("endless sex loop: " + SelfName)
 	
 	controller.UnregisterForUpdate()
 	float laststagewait = SexLab.Config.StageTimerAggr[4]

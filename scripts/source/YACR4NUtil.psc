@@ -13,6 +13,10 @@ Function Log(String msg)
 	endif
 EndFunction
 
+int Function GetArousal(Actor act)
+	return act.GetFactionRank(sla_Arousal)
+EndFunction
+
 bool Function _validateSex(Actor victim, Actor aggr, int cfg, int aggrsex = -1)
 	; check gender
 	; 0 is straight, 1 is both, 2 is homo
@@ -275,3 +279,5 @@ Faction Property HagravenFaction  Auto
 ReferenceAlias  Property YACR4NHelperMainAggr Auto
 Quest Property YACR4NHelperHumanSearcher Auto
 Quest Property YACR4NHelperCreatureSearcher Auto
+
+Faction Property sla_Arousal  Auto  

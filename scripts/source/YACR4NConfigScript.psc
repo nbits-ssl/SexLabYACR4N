@@ -9,6 +9,10 @@ bool Property enableEndlessRape = true Auto
 int Property rapeChance = 100 Auto
 int Property healthLimit = 100 Auto
 
+int Property rapeChanceFollower = 5 Auto
+int Property healthLimitFollower = 25 Auto
+bool Property linkArousal = true Auto
+
 int Property matchedSex = 0 Auto
 bool Property enableDrippingWASupport = false Auto
 
@@ -25,6 +29,10 @@ int searchDistanceID
 int enableEndlessRapeID
 int rapeChanceID
 int healthLimitID
+
+int rapeChanceFollowerID
+int healthLimitFollowerID
+int linkArousalID
 
 int matchedSexID
 int enableDrippingWASupportID
@@ -53,9 +61,10 @@ Event OnVersionUpdate(int a_version)
 EndEvent
 
 Event OnConfigInit()
-	Pages = new string[4]
+	Pages = new string[3]
 	Pages[0] = "$YACR4N_General"
-	Pages[1] = "$YACR4N_Status"
+	Pages[1] = "$YACR4N_Enemy"
+	Pages[2] = "$YACR4N_Status"
 	
 	matchedSexList = new string[3]
 	matchedSexList[0] = "$YACR4N_SexStraight"
@@ -73,29 +82,33 @@ Event OnPageReset(string page)
 
 		updatePeriodID = AddSliderOption("$YACR4N_UpdatePeriod", updatePeriod)
 		searchDistanceID = AddSliderOption("$YACR4N_SearchDistance", YACR4NDistance.GetValue() as int)
+		matchedSexID = AddMenuOption("$YACR4N_MatchedSex", matchedSexList[matchedSex])
 
 		AddEmptyOption()
+		AddEmptyOption()
+		AddHeaderOption("$YACR4N_NpcToNpc")
 
-		matchedSexID = AddMenuOption("$YACR4N_MatchedSex", matchedSexList[matchedSex])
 		healthLimitID = AddSliderOption("$YACR4N_HealthLimit", healthLimit)
 		rapeChanceID = AddSliderOption("$YACR4N_RapeChance", rapeChance)
 		enableEndlessRapeID = AddToggleOption("$YACR4N_EndlessRape", enableEndlessRape)
-		
-		AddEmptyOption()
-	
-		enableDrippingWASupportID = AddToggleOption("$YACR4N_EnableDrippingWASupport", enableDrippingWASupport)
-		
-		AddEmptyOption()
 		
 		SetCursorPosition(1)
 		AddHeaderOption("$YACR4N_System")
 		
 		modEnabledID = AddToggleOption("$YACR4N_ModEnabled", modEnabled)
 		markerEnabledID = AddToggleOption("$YACR4N_MarkerEnabled", markerEnabled)
+		enableDrippingWASupportID = AddToggleOption("$YACR4N_EnableDrippingWASupport", enableDrippingWASupport)
 		debugLogFlagID = AddToggleOption("$YACR4N_OutputPapyrusLog", debugLogFlag)
 		
 		AddEmptyOption()
+		AddHeaderOption("$YACR4N_FollowerToNpc")
+		healthLimitFollowerID = AddSliderOption("$YACR4N_HealthLimit", healthLimitFollower)
+		rapeChanceFollowerID = AddSliderOption("$YACR4N_RapeChance", rapeChanceFollower)
+		linkArousalID = AddToggleOption("$YACR4N_LinkArousal", linkArousal)
 		
+	elseif (page == "$YACR4N_Enemy")
+		SetCursorFillMode(TOP_TO_BOTTOM)
+		SetCursorPosition(0)
 		AddHeaderOption("$YACR4N_DisableEnemyRaces")
 		
 		int len = DisableRaces.Length
@@ -159,12 +172,14 @@ string Function getRaceName(Race srace)
 EndFunction
 
 Event OnOptionHighlight(int option)
-	if (option == healthLimitID)
+	if (option == healthLimitID || option == healthLimitFollowerID)
 		SetInfoText("$YACR4N_HealthLimitInfo")
-	elseif (option == rapeChanceID)
+	elseif (option == rapeChanceID || option == rapeChanceFollowerID)
 		SetInfoText("$YACR4N_RapeChanceInfo")
 	elseif (option == enableEndlessRapeID)
 		SetInfoText("$YACR4N_EndlessRapeInfo")
+	elseif (option == linkArousalID)
+		SetInfoText("$YACR4N_LinkArousalInfo")
 	elseif (option == matchedSexID)
 		SetInfoText("$YACR4N_MatchedSexInfo")
 	elseif (option == enableDrippingWASupportID)
@@ -184,6 +199,9 @@ Event OnOptionSelect(int option)
 	if (option == enableEndlessRapeID)
 		enableEndlessRape = !enableEndlessRape
 		SetToggleOptionValue(option, enableEndlessRape)
+	elseif (option == linkArousalID)
+		linkArousal = !linkArousal
+		SetToggleOptionValue(option, linkArousal)
 	elseif (option == enableDrippingWASupportID)
 		enableDrippingWASupport = !enableDrippingWASupport
 		SetToggleOptionValue(option, enableDrippingWASupport)
@@ -213,6 +231,10 @@ Event OnOptionSliderOpen(int option)
 		self._setSliderDialogWithPercentage(healthLimit)
 	elseif (option == rapeChanceID)
 		self._setSliderDialogWithPercentage(rapeChance)
+	elseif (option == rapeChanceFollowerID)
+		self._setSliderDialogWithPercentage(rapeChanceFollower)
+	elseif (option == healthLimitFollowerID)
+		self._setSliderDialogWithPercentage(healthLimitFollower)
 	elseif (option == updatePeriodID)
 		SetSliderDialogStartValue(updatePeriod)
 		SetSliderDialogDefaultValue(15)
@@ -237,6 +259,10 @@ Event OnOptionSliderAccept(int option, float value)
 		healthLimit = value as int
 	elseif (option == rapeChanceID)
 		rapeChance = value as int
+	elseif (option == healthLimitFollowerID)
+		healthLimitFollower = value as int
+	elseif (option == rapeChanceFollowerID)
+		rapeChanceFollower = value as int
 	elseif (option == updatePeriodID)
 		updatePeriod = value as int
 	elseif (option == searchDistanceID)
