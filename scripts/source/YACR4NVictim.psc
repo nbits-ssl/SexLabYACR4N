@@ -29,6 +29,7 @@ Event OnHit(ObjectReference akAggressor, Form akSource, Projectile akProjectile,
 		AppUtil.Log("onhit success " + SelfName)
 		float healthper = selfact.GetAVPercentage("health") * 100
 		
+		
 		if (selfact.IsInFaction(SSLAnimatingFaction)) ; first check
 			if selfact.HasKeyWordString("SexLabActive")  ; other sexlab's sex
 				AppUtil.Log("detect other SexLab's Sex, EndAnimation " + SelfName)
@@ -39,12 +40,14 @@ Event OnHit(ObjectReference akAggressor, Form akSource, Projectile akProjectile,
 				selfact.RemoveFromFaction(SSLAnimatingFaction)
 				; ##FIXME## Instead ActorLib.ValidateActor ?
 			endif
-		elseif (akAggr.IsPlayerTeammate() && healthper < Config.healthLimitFollower && \
-				Utility.RandomInt() as float < self._getFollowersRapeChance(akAggr))
+		elseif (akAggr.IsPlayerTeammate())
+			float frapechance = self._getFollowersRapeChance(akAggr)
 			
-			AppUtil.Log("doSex(follower) " + SelfName)
-			self.doSex(akAggr)
-			
+			if (healthper < Config.healthLimitFollower && Utility.RandomInt() as float < frapechance)
+				AppUtil.Log("### doSex(follower) " + Config.healthLimitFollower + ", " + frapechance)
+				AppUtil.Log("doSex(follower) " + SelfName)
+				self.doSex(akAggr)
+			endif
 		elseif (healthper < Config.healthLimit && Utility.RandomInt() < Config.rapeChance)
 			AppUtil.Log("doSex " + SelfName)
 			self.doSex(akAggr)
@@ -435,6 +438,9 @@ Function EndSexEvent(Actor aggr)
 	else ; Aggr's OnHit or Not EndlessRape
 		AppUtil.Log("EndSexEvent, truely end " + SelfName)
 		self._endSexVictim()
+		if (aggr.IsPlayerTeammate())
+			AppUtil.AddCalm(selfact)
+		endif
 		
 		AppUtil.CleanFlyingDeadBody(aggr)
 		self._cleanDeadBody(Helper1)

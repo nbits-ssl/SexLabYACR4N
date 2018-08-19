@@ -1,7 +1,7 @@
 Scriptname YACR4NUtil extends Quest  
 
 int Function GetVersion()
-	return 20180809
+	return 20180818
 EndFunction
 
 Function Log(String msg)
@@ -219,6 +219,12 @@ sslBaseAnimation[] Function BuildAnimation(Actor[] actors)
 	return SexLab.GetAnimationsByTags(actors.Length, tag, tagsuppress, requireall)
 EndFunction
 
+Function AddCalm(Actor act)
+	if !(act.HasSpell(YACR4NCalm))
+		act.AddSpell(YACR4NCalm)
+	endif
+EndFunction
+
 ; from creationkit.com, author is Chesko || Form[] => Actor[]
 bool function ArraySort(Actor[] myArray, int i = 0)
 	bool bFirstNoneFound = false
@@ -281,3 +287,4 @@ Quest Property YACR4NHelperHumanSearcher Auto
 Quest Property YACR4NHelperCreatureSearcher Auto
 
 Faction Property sla_Arousal  Auto  
+SPELL Property YACR4NCalm  Auto  

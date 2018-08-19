@@ -9,8 +9,8 @@ bool Property enableEndlessRape = true Auto
 int Property rapeChance = 100 Auto
 int Property healthLimit = 100 Auto
 
-int Property rapeChanceFollower = 5 Auto
-int Property healthLimitFollower = 25 Auto
+int Property rapeChanceFollower = 50 Auto
+int Property healthLimitFollower = 50 Auto
 bool Property linkArousal = true Auto
 
 int Property matchedSex = 0 Auto
