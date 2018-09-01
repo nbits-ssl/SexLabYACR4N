@@ -52,6 +52,9 @@ SexLab Yet Another Combat Rape(SexLab YACR)のNPC版。
   ません。合致するアニメーションがない場合、行為は中断されます。この場合
   でも終了処理は正常に走ります。
 
+* Mod追加された召喚NPCでも女性であれば効果を受けます。特にColoful Magic
+  の特定の召喚は弱体化します。
+
 
 ## 既知の問題
 

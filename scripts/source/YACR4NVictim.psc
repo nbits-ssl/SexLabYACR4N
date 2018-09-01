@@ -29,12 +29,15 @@ Event OnHit(ObjectReference akAggressor, Form akSource, Projectile akProjectile,
 		AppUtil.Log("onhit success " + SelfName)
 		float healthper = selfact.GetAVPercentage("health") * 100
 		
-		
 		if (selfact.IsInFaction(SSLAnimatingFaction)) ; first check
-			if selfact.HasKeyWordString("SexLabActive")  ; other sexlab's sex
-				AppUtil.Log("detect other SexLab's Sex, EndAnimation " + SelfName)
+			if selfact.HasKeyWordString("SexLabActive")
+				AppUtil.Log("detect SexLab's Sex, EndAnimation " + SelfName)
+				if selfact.IsInFaction(YACR4NActionFaction)
+					selfact.SetGhost(true)
+				endif
 				sslThreadController controller = SexLab.GetActorController(selfact)
 				controller.EndAnimation()
+				; selfact.SetGhost(false) ;  in Alias's spell YACR4NVictimizeEffect
 			else  ; not animating, this is yacr's bug
 				AppUtil.Log("detect invalid SSLAnimatingFaction, delete " + SelfName)
 				selfact.RemoveFromFaction(SSLAnimatingFaction)
@@ -127,9 +130,9 @@ Function doSex(Actor aggr)
 			self._waitSetup(controller)
 			
 			Utility.Wait(1.0)
-			; self._endSexAggr(aggr)
-			aggr.SetGhost(false) ; _endSexAggr()
-			AppUtil.Log("aggr setghost disable " + SelfName)
+			aggr.SetGhost(false)
+			victim.SetGhost(false)
+			AppUtil.Log("vicim/aggr setghost disable " + SelfName)
 			MarkerQuest.Track(HookName, victim, aggr)
 		else
 			AppUtil.Log("###FIXME### controller not found, recover setup " + SelfName)
@@ -288,36 +291,24 @@ Event StageStartEventYACR(int tid, bool HasPlayer)
 	sslThreadController controller = UpdateController
 	int stagecnt = controller.Animation.StageCount
 	
-	if (Config.enableDrippingWASupport)
-		if (controller.Stage >= stagecnt - 1)
-			selfact.SetGhost(false)
-		else
-			selfact.SetGhost(true)
-		endif
-	endif
-	
 	; for Onhit missing de-ghost
 	if (controller.Stage > 1 && aggr.IsGhost())
 		aggr.SetGhost(false)
-		AppUtil.Log("###FIXME### Onhit missing de-ghost " + SelfName)
+		AppUtil.Log("###FIXME### Onhit missing de-ghost aggr" + SelfName)
+	endif
+	if (controller.Stage > 1 && selfact.IsGhost())
+		selfact.SetGhost(false)
+		AppUtil.Log("###FIXME### Onhit missing de-ghost victim" + SelfName)
 	endif
 	
 	if (controller.Stage == stagecnt)
-		self._applyCum(selfact, controller)
+		SexLab.ActorLib.ApplyCum(controller.Positions[0], controller.Animation.GetCum(0))
 		
 		if (Config.enableEndlessRape && !aggr.IsPlayerTeammate())
 			self._sexLoop(selfact, aggr, controller)
 		endif
 	endif
 EndEvent
-
-Function _applyCum(Actor victim, sslThreadController controller)
-	victim.SetGhost(false)
-	SexLab.ActorLib.ApplyCum(controller.Positions[0], controller.Animation.GetCum(0))
-	if (!Config.enableDrippingWASupport)
-		victim.SetGhost(true)
-	endif
-EndFunction
 
 Function _sexLoop(Actor victim, Actor aggr, sslThreadController controller)
 	AppUtil.Log("endless sex loop: " + SelfName)
