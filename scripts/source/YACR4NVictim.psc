@@ -388,6 +388,7 @@ Event OnUpdate()
 		RegisterForSingleUpdate(ForceUpdatePeriod)
 	else
 		AppUtil.Log("OnUpdate, Unregister for single update loop " + SelfName)
+		MarkerQuest.Clear(HookName) ; for missed clearing
 		UnregisterForUpdate() ; for ForceUpdateController
 	endif
 EndEvent
@@ -428,8 +429,10 @@ Function EndSexEvent(Actor aggr)
 		self.doSexLoop()
 	else ; Aggr's OnHit or Not EndlessRape
 		AppUtil.Log("EndSexEvent, truely end " + SelfName)
+		MarkerQuest.Clear(HookName)
+		
 		self._endSexVictim()
-		if (aggr.IsPlayerTeammate())
+		if (aggr && aggr.IsPlayerTeammate())
 			AppUtil.AddCalm(selfact)
 		endif
 		
@@ -438,7 +441,6 @@ Function EndSexEvent(Actor aggr)
 		self._cleanDeadBody(Helper2)
 		self._cleanDeadBody(Helper3)
 		
-		MarkerQuest.Clear(HookName)
 		Aggressor.Clear()
 		self._clearHelpers()
 		
