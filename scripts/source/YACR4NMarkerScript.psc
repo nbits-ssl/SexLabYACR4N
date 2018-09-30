@@ -39,15 +39,19 @@ Function Clear(string hookName)
 	endif
 EndFunction
 
+Function ClearAll()
+	int len = HookNameList.Length
+	while len
+		len -= 1
+		self.Clear(HookNameList[len])
+	endwhile
+EndFunction
+
 Function Toggle(bool enabled)
 	if (enabled)
 		self.Start()
 	else
-		int len = HookNameList.Length
-		while len
-			len -= 1
-			self.Clear(HookNameList[len])
-		endwhile
+		self.ClearAll()
 		self.SetObjectiveDisplayed(0, false)
 		self.Stop()
 	endif
