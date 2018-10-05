@@ -428,11 +428,12 @@ Function EndSexEvent(Actor aggr)
 		
 		self.doSexLoop()
 	else ; Aggr's OnHit or Not EndlessRape
-		AppUtil.Log("EndSexEvent, truely end " + SelfName)
+		int cums = SexLab.CountCum(selfact)
+		AppUtil.Log("EndSexEvent, truely end: Cums(" + cums + ") " + SelfName)
 		MarkerQuest.Clear(HookName)
 		
 		self._endSexVictim()
-		if (aggr && aggr.IsPlayerTeammate())
+		if (aggr && aggr.IsPlayerTeammate() && cums > 0)
 			AppUtil.AddCalm(selfact)
 		endif
 		
