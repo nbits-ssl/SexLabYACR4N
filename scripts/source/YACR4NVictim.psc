@@ -29,20 +29,22 @@ Event OnHit(ObjectReference akAggressor, Form akSource, Projectile akProjectile,
 		AppUtil.Log("onhit success " + SelfName)
 		float healthper = selfact.GetAVPercentage("health") * 100
 		
-		if (selfact.IsInFaction(SSLAnimatingFaction)) ; first check
-			if selfact.HasKeyWordString("SexLabActive")
-				AppUtil.Log("detect SexLab's Sex, EndAnimation " + SelfName)
-				if selfact.IsInFaction(YACR4NActionFaction)
-					selfact.SetGhost(true)
-				endif
-				sslThreadController controller = SexLab.GetActorController(selfact)
-				controller.EndAnimation()
-				; selfact.SetGhost(false) ;  in Alias's spell YACR4NVictimizeEffect
-			else  ; not animating, this is yacr's bug
-				AppUtil.Log("detect invalid SSLAnimatingFaction, delete " + SelfName)
-				selfact.RemoveFromFaction(SSLAnimatingFaction)
-				; ##FIXME## Instead ActorLib.ValidateActor ?
+		if (selfact.IsInFaction(SSLAnimatingFaction) && !selfact.HasKeyWordString("SexLabActive"))
+			; not animating, this is yacr's bug
+			AppUtil.Log("detect invalid SSLAnimatingFaction, delete " + SelfName)
+			selfact.RemoveFromFaction(SSLAnimatingFaction)
+			; ##FIXME## Instead ActorLib.ValidateActor ?
+		endif
+		
+		if selfact.HasKeyWordString("SexLabActive") ; first check
+			AppUtil.Log("detect SexLab's Sex, EndAnimation " + SelfName)
+			if selfact.IsInFaction(YACR4NActionFaction)
+				selfact.SetGhost(true)
 			endif
+			sslThreadController controller = SexLab.GetActorController(selfact)
+			controller.EndAnimation()
+			selfact.SetGhost(false) ; in Alias's spell YACR4NVictimizeEffect, but.
+			Utility.Wait(1.5) ; and more busy state for non stop combat situation (tako-naguri)
 		elseif (akAggr.IsPlayerTeammate())
 			float frapechance = self._getFollowersRapeChance(akAggr)
 			
@@ -280,8 +282,9 @@ Event StageStartEventYACR(int tid, bool HasPlayer)
 	Actor aggr = Aggressor.GetActorRef()
 	UnregisterForUpdate()
 	
-	if (selfact.IsDead()) ; almost happen by killmove
-		AppUtil.Log("StageStartEvent, victim already has dead, stop " + SelfName)
+	if (!selfact || !aggr || selfact.IsDead()) ; almost happen by killmove
+		AppUtil.Log("StageStartEvent, victim already has dead or nothing victim or aggr, stop " + SelfName)
+		EndlessSexLoop = false
 		self.EndSexEvent(aggr)
 		return
 	endif
@@ -474,12 +477,14 @@ EndEvent
 ;EndEvent
 
 Event OnDeath(Actor akKiller)
-	AppUtil.Log("### OnDeath, clear aliases " + SelfName)
+	AppUtil.Log("### OnDeath, clear aliases " + HookName + " " + SelfName)
 	self._endSexVictim()
 	MarkerQuest.Clear(HookName)
 	Aggressor.Clear()
 	self._clearHelpers()
+	Utility.Wait(3.0)
 	self.Clear()
+	AppUtil.Log("### OnDeath, cleared " + HookName)
 EndEvent
 
 

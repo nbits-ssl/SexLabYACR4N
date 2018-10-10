@@ -32,8 +32,8 @@ Event OnHit(ObjectReference akAggressor, Form akSource, Projectile akProjectile,
 			selfact.SetGhost(true)
 			sslThreadController controller = SexLab.GetActorController(selfact)
 			controller.EndAnimation()
-			; selfact.SetGhost(false) ;  in Alias's spell YACRStopCombatEffect
 		endif
+		selfact.SetGhost(false) ; in Alias's spell YACRStopCombatEffect etc.., but 3rd check
 	endif
 	
 	Utility.Wait(0.5)
@@ -43,7 +43,7 @@ EndEvent
 
 State Busy
 	Event OnHit(ObjectReference akAggressor, Form akSource, Projectile akProjectile, bool abPowerAttack, bool abSneakAttack, bool abBashAttack, bool abHitBlocked)
-		AppUtil.Log("enemy busy " + SelfName)
+		AppUtil.Log("enemy busy " + SelfName) ; not happen maybe
 		; do nothing
 	EndEvent
 EndState

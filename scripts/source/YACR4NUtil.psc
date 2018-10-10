@@ -1,7 +1,7 @@
 Scriptname YACR4NUtil extends Quest  
 
 int Function GetVersion()
-	return 20181004
+	return 20181011
 EndFunction
 
 Function Log(String msg)
