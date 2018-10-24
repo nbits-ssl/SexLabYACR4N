@@ -19,7 +19,7 @@ bool Function FillAlias(Actor act)
 			victim = Victims[i].GetActorRef()
 			if (victim.GetDistance(Player) > yacrDistance && \
 				!victim.IsInFaction(YACR4NActionFaction) && \
-				victim.IsInCombat())
+				!victim.IsInCombat())
 				
 				Victims[i].Clear()
 				Victims[i].ForceRefTo(act)
