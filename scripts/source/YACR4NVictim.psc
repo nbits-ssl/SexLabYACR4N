@@ -22,7 +22,8 @@ Event OnHit(ObjectReference akAggressor, Form akSource, Projectile akProjectile,
 	Weapon wpn = akSource as Weapon
 	
 	if (!wpn || selfact.IsGhost() || selfact.IsDead() || akAggr == PlayerActor || \
-		selfact.IsInKillMove() || akAggr.IsInKillMove() || (wpn == Unarmed && selfact.GetDistance(akAggr) > 150.0))
+		selfact.IsInKillMove() || akAggr.IsInKillMove() || \
+		(wpn == Unarmed && !AppUtil.IsDragon(akAggr) && selfact.GetDistance(akAggr) > 150.0))
 		
 		; do nothing & not return
 	elseif (!abHitBlocked && wpn.GetWeaponType() < 7) ; exclude Bow/Staff/Crossbow

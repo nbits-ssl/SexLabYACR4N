@@ -1,7 +1,7 @@
 Scriptname YACR4NUtil extends Quest  
 
 int Function GetVersion()
-	return 20181020
+	return 20181103
 EndFunction
 
 Function Log(String msg)
@@ -52,6 +52,10 @@ int Function _validateCreature(Actor ActorRef)  ; from ActorLib.ValidateActor
 	endIf
 	
 	return 1
+EndFunction
+
+bool Function IsDragon(Actor dragon)
+	return dragon.IsInFaction(DragonFaction)
 EndFunction
 
 bool Function ValidateAggr(Actor victim, Actor aggr, int cfg)
@@ -279,6 +283,7 @@ SexLabFramework Property SexLab  Auto
 YACR4NConfigScript Property Config Auto
 
 Keyword Property ActorTypeNPC  Auto  
+Faction Property DragonFaction  Auto  
 Faction Property SprigganFaction  Auto  
 Faction Property HagravenFaction  Auto  
 
