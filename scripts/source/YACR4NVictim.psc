@@ -326,8 +326,9 @@ Function _sexLoop(Actor victim, Actor aggr, sslThreadController controller)
 		return ; no handling, leave it to SexLab
 	endif
 	
-	int rndint = Utility.RandomInt()
+	controller.SendThreadEvent("OrgasmEnd") ; for Aroused
 	
+	int rndint = Utility.RandomInt()
 	if (rndint < 10) ; 10%
 		self._sexLoopOneMore(controller)
 	elseif (rndint < 20) ; 20%
