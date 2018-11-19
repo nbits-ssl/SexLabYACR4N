@@ -25,8 +25,10 @@ Function _reload()
 		cellreload = false
 		Utility.Wait(0.5)
 	endif
-	YACR4NSearch.Stop()
-	YACR4NSearch.Start()
+	if (!self.GetActorRef().IsInCombat())
+		YACR4NSearch.Stop()
+		YACR4NSearch.Start()
+	endif
 EndFunction
 
 YACR4NUtil Property AppUtil Auto
