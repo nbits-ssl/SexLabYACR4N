@@ -111,7 +111,7 @@ Function doSex(Actor aggr)
 		return
 	endif
 	
-	if (Aggressor.ForceRefIfEmpty(aggr))
+	if (!victim.IsInKillMove() && !aggr.IsInKillMove() && Aggressor.ForceRefIfEmpty(aggr))
 		self._readySexVictim()
 		
 		actor[] sexActors = new actor[2]
