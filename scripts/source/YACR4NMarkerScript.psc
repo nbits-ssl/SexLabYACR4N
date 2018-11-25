@@ -19,9 +19,12 @@ EndEvent
 
 Function Track(string hookName, Actor victim, Actor aggr)
 	int idx = HookNameList.Find(hookName)
-	AppUtil.Log("Track marker id: " + idx)
 	
-	if (idx >= 0 && victim && aggr)
+	AppUtil.Log("Track marker id: " + idx)
+	Utility.Wait(2.0)
+	
+	if (victim.HasKeywordString("SexLabActive") && idx >= 0 && victim && aggr)
+		AppUtil.Log("Success Track marker id: " + idx)
 		Aggrs[idx].ForceRefTo(aggr)
 		Victims[idx].ForceRefTo(victim)
 		self.SetObjectiveDisplayed(idx + 999, true)
