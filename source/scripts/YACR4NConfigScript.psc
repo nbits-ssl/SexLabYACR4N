@@ -37,6 +37,12 @@ int linkArousalID
 int matchedSexID
 int enableDrippingWASupportID
 
+int configSaveID
+int configLoadID
+
+string configFileName = "../SexLabYACR4NPCConfig.json"
+
+
 int[] disableEnemyRacesIDS
 string[] matchedSexList
 
@@ -61,10 +67,11 @@ Event OnVersionUpdate(int a_version)
 EndEvent
 
 Event OnConfigInit()
-	Pages = new string[3]
+	Pages = new string[4]
 	Pages[0] = "$YACR4N_General"
 	Pages[1] = "$YACR4N_Enemy"
 	Pages[2] = "$YACR4N_Status"
+	Pages[3] = "$YACR4N_Profile"
 	
 	matchedSexList = new string[3]
 	matchedSexList[0] = "$YACR4N_SexStraight"
@@ -156,6 +163,17 @@ Event OnPageReset(string page)
 			endif
 			n += 1
 		endWhile
+	elseif (page == "$YACR4N_Profile")
+		SetCursorFillMode(TOP_TO_BOTTOM)
+
+		SetCursorPosition(0)
+		AddHeaderOption("$YACR4N_Config")
+		configSaveID = AddTextOption("$YACR4N_ConfigSave", "$YACR4N_DoIt")
+		if (JsonUtil.JsonExists(configFileName))
+			configLoadID = AddTextOption("$YACR4N_ConfigLoad", "$YACR4N_DoIt")
+		else
+			configLoadID = AddTextOption("$YACR4N_ConfigLoad", "$YACR4N_DoIt", OPTION_FLAG_DISABLED)
+		endif
 	endif
 EndEvent
 
@@ -192,6 +210,12 @@ Event OnOptionHighlight(int option)
 		SetInfoText("$YACR4N_ModEnabledInfo")
 	elseif (disableEnemyRacesIDS.Find(option) > -1)
 		SetInfoText("$YACR4N_DisableEnemyRacesInfo")
+
+	elseif (option == configSaveID)
+		SetInfoText("$YACR4N_ConfigSaveInfo")
+	elseif (option == configLoadID)
+		SetInfoText("$YACR4N_ConfigLoadInfo")
+
 	endif
 EndEvent
 
@@ -223,6 +247,14 @@ Event OnOptionSelect(int option)
 		bool opt = DisableRacesConfig[idx]
 		DisableRacesConfig[idx] = !opt
 		SetToggleOptionValue(option, !opt)
+
+	elseif (option == configSaveID)
+		self.saveConfig(configFileName)
+		SetTextOptionValue(option, "$YACR4N_Done")
+	elseif (option == configLoadID)
+		self.loadConfig(configFileName)
+		SetTextOptionValue(option, "$YACR4N_Done")
+
 	endif
 EndEvent
 
@@ -286,6 +318,74 @@ event OnOptionMenuAccept(int option, int index)
 		SetMenuOptionValue(option, matchedSexList[matchedSex])
 	endif
 endEvent
+
+; Profile
+
+Function saveConfig(string configFile)
+	JsonUtil.SetIntValue(configFile, "modEnabled", modEnabled as int)
+	JsonUtil.SetIntValue(configFile, "markerEnabled", markerEnabled as int)
+	JsonUtil.SetIntValue(configFile, "debugLogFlag", debugLogFlag as int)
+	JsonUtil.SetIntValue(configFile, "updatePeriod", updatePeriod)
+
+	JsonUtil.SetIntValue(configFile, "enableEndlessRape", enableEndlessRape as int)
+	JsonUtil.SetIntValue(configFile, "rapeChance", rapeChance)
+	JsonUtil.SetIntValue(configFile, "healthLimit", healthLimit)
+
+	JsonUtil.SetIntValue(configFile, "rapeChanceFollower", rapeChanceFollower)
+	JsonUtil.SetIntValue(configFile, "healthLimitFollower", healthLimitFollower)
+	JsonUtil.SetIntValue(configFile, "linkArousal", linkArousal as int)
+
+	JsonUtil.SetIntValue(configFile, "matchedSex", matchedSex)
+	JsonUtil.SetIntValue(configFile, "enableDrippingWASupport", enableDrippingWASupport as int)
+	
+	JsonUtil.SetIntValue(configFile, "YACR4NDistance", YACR4NDistance.GetValue() as int)
+	ExportBoolList(configFile, "DisableRacesConfig", DisableRacesConfig, DisableRacesConfig.Length)
+	JsonUtil.Save(configFile)
+EndFunction
+
+Function loadConfig(string configFile)
+	modEnabled = JsonUtil.GetIntValue(configFile, "modEnabled")
+	markerEnabled = JsonUtil.GetIntValue(configFile, "markerEnabled")
+	debugLogFlag = JsonUtil.GetIntValue(configFile, "debugLogFlag")
+	updatePeriod = JsonUtil.GetIntValue(configFile, "updatePeriod")
+
+	enableEndlessRape = JsonUtil.GetIntValue(configFile, "enableEndlessRape")
+	rapeChance = JsonUtil.GetIntValue(configFile, "rapeChance")
+	healthLimit = JsonUtil.GetIntValue(configFile, "healthLimit")
+
+	rapeChanceFollower = JsonUtil.GetIntValue(configFile, "rapeChanceFollower")
+	healthLimitFollower = JsonUtil.GetIntValue(configFile, "healthLimitFollower")
+	linkArousal = JsonUtil.GetIntValue(configFile, "linkArousal")
+
+	matchedSex = JsonUtil.GetIntValue(configFile, "matchedSex")
+	enableDrippingWASupport = JsonUtil.GetIntValue(configFile, "enableDrippingWASupport")
+
+	YACR4NDistance.SetValue(JsonUtil.GetIntValue(configFile, "YACR4NDistance"))
+	ImportBoolList(configFile, "DisableRacesConfig", DisableRacesConfig, DisableRacesConfig.Length)
+EndFunction
+
+; Boolean Arrays from SexLab
+function ExportBoolList(string FileName, string Name, bool[] Values, int len)
+	JsonUtil.IntListClear(FileName, Name)
+	int i
+	while i < len
+		JsonUtil.IntListAdd(FileName, Name, Values[i] as int)
+		i += 1
+	endWhile
+endFunction
+bool[] function ImportBoolList(string FileName, string Name, bool[] Values, int len)
+	if JsonUtil.IntListCount(FileName, Name) == len
+		if Values.Length != len
+			Values = Utility.CreateBoolArray(len)
+		endIf
+		int i
+		while i < len
+			Values[i] = JsonUtil.IntListGet(FileName, Name, i) as bool
+			i += 1
+		endWhile
+	endIf
+	return Values
+endFunction
 
 
 YACR4NQuest Property YACR4NScript  Auto 
