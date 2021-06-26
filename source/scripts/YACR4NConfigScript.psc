@@ -287,20 +287,23 @@ Function _setSliderDialogWithPercentage(int x)
 EndFunction
 
 Event OnOptionSliderAccept(int option, float value)
+	int ivalue = value as int
+	
 	if (option == healthLimitID)
-		healthLimit = value as int
+		healthLimit = ivalue
 	elseif (option == rapeChanceID)
-		rapeChance = value as int
+		rapeChance = ivalue
 	elseif (option == healthLimitFollowerID)
-		healthLimitFollower = value as int
+		healthLimitFollower = ivalue
 	elseif (option == rapeChanceFollowerID)
-		rapeChanceFollower = value as int
+		rapeChanceFollower = ivalue
 	elseif (option == updatePeriodID)
-		updatePeriod = value as int
+		updatePeriod = ivalue
 	elseif (option == searchDistanceID)
-		YACR4NDistance.SetValue(value as int)
+		YACR4NDistance.SetValue(ivalue)
 	endif
-	SetSliderOptionValue(option, value as int)
+	
+	SetSliderOptionValue(option, ivalue)
 EndEvent
 
 event OnOptionMenuOpen(int option)
