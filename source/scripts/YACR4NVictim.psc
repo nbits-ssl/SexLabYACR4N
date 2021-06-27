@@ -443,9 +443,9 @@ Function EndSexEvent(Actor aggr)
 		endif
 		
 		AppUtil.CleanFlyingDeadBody(aggr)
-		self._cleanDeadBody(Helper1)
-		self._cleanDeadBody(Helper2)
-		self._cleanDeadBody(Helper3)
+		self._cleanDeadBodyRef(Helper1)
+		self._cleanDeadBodyRef(Helper2)
+		self._cleanDeadBodyRef(Helper3)
 		
 		Aggressor.Clear()
 		self._clearHelpers()
@@ -457,11 +457,9 @@ Function EndSexEvent(Actor aggr)
 	endif
 EndFunction
 
-Function _cleanDeadBody(ReferenceAlias enemy)
+Function _cleanDeadBodyRef(ReferenceAlias enemy)
 	Actor act = enemy.GetActorRef()
-	if (act)
-		AppUtil.CleanFlyingDeadBody(act)
-	endif
+	AppUtil.CleanFlyingDeadBody(act)
 EndFunction
 
 Event OnCombatStateChanged(Actor akTarget, int aeCombatState)
