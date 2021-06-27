@@ -14,7 +14,7 @@ int Property healthLimitFollower = 50 Auto
 bool Property linkArousal = true Auto
 
 int Property matchedSex = 0 Auto
-bool Property enableDrippingWASupport = false Auto
+bool Property enableDrippingWASupport = false Auto ; not use from 1.1
 
 Race[] Property DisableRaces  Auto  
 Bool[] Property DisableRacesConfig  Auto  
@@ -35,7 +35,7 @@ int healthLimitFollowerID
 int linkArousalID
 
 int matchedSexID
-int enableDrippingWASupportID
+int enableDrippingWASupportID ; not use from 1.1
 
 int configSaveID
 int configLoadID
@@ -104,7 +104,7 @@ Event OnPageReset(string page)
 		
 		modEnabledID = AddToggleOption("$YACR4N_ModEnabled", modEnabled)
 		markerEnabledID = AddToggleOption("$YACR4N_MarkerEnabled", markerEnabled)
-		enableDrippingWASupportID = AddToggleOption("$YACR4N_EnableDrippingWASupport", enableDrippingWASupport)
+		; enableDrippingWASupportID = AddToggleOption("$YACR4N_EnableDrippingWASupport", enableDrippingWASupport)
 		debugLogFlagID = AddToggleOption("$YACR4N_OutputPapyrusLog", debugLogFlag)
 		
 		AddEmptyOption()
@@ -200,8 +200,8 @@ Event OnOptionHighlight(int option)
 		SetInfoText("$YACR4N_LinkArousalInfo")
 	elseif (option == matchedSexID)
 		SetInfoText("$YACR4N_MatchedSexInfo")
-	elseif (option == enableDrippingWASupportID)
-		SetInfoText("$YACR4N_EnableDrippingWASupportInfo")
+	; elseif (option == enableDrippingWASupportID)
+	;	SetInfoText("$YACR4N_EnableDrippingWASupportInfo")
 	elseif (option == updatePeriodID)
 		SetInfoText("$YACR4N_UpdatePeriodInfo")
 	elseif (option == searchDistanceID)
@@ -226,9 +226,9 @@ Event OnOptionSelect(int option)
 	elseif (option == linkArousalID)
 		linkArousal = !linkArousal
 		SetToggleOptionValue(option, linkArousal)
-	elseif (option == enableDrippingWASupportID)
-		enableDrippingWASupport = !enableDrippingWASupport
-		SetToggleOptionValue(option, enableDrippingWASupport)
+	; elseif (option == enableDrippingWASupportID)
+	;	enableDrippingWASupport = !enableDrippingWASupport
+	;	SetToggleOptionValue(option, enableDrippingWASupport)
 	elseif (option == debugLogFlagID)
 		debugLogFlag = !debugLogFlag
 		SetToggleOptionValue(option, debugLogFlag)
@@ -339,7 +339,7 @@ Function saveConfig(string configFile)
 	JsonUtil.SetIntValue(configFile, "linkArousal", linkArousal as int)
 
 	JsonUtil.SetIntValue(configFile, "matchedSex", matchedSex)
-	JsonUtil.SetIntValue(configFile, "enableDrippingWASupport", enableDrippingWASupport as int)
+	; JsonUtil.SetIntValue(configFile, "enableDrippingWASupport", enableDrippingWASupport as int)
 	
 	JsonUtil.SetIntValue(configFile, "YACR4NDistance", YACR4NDistance.GetValue() as int)
 	ExportBoolList(configFile, "DisableRacesConfig", DisableRacesConfig, DisableRacesConfig.Length)
@@ -361,7 +361,7 @@ Function loadConfig(string configFile)
 	linkArousal = JsonUtil.GetIntValue(configFile, "linkArousal")
 
 	matchedSex = JsonUtil.GetIntValue(configFile, "matchedSex")
-	enableDrippingWASupport = JsonUtil.GetIntValue(configFile, "enableDrippingWASupport")
+	; enableDrippingWASupport = JsonUtil.GetIntValue(configFile, "enableDrippingWASupport")
 
 	YACR4NDistance.SetValue(JsonUtil.GetIntValue(configFile, "YACR4NDistance"))
 	ImportBoolList(configFile, "DisableRacesConfig", DisableRacesConfig, DisableRacesConfig.Length)
