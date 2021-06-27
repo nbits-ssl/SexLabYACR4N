@@ -322,7 +322,8 @@ Function _sexLoop(Actor victim, Actor aggr, sslThreadController controller)
 	if (laststagewait > 1)
 		Utility.Wait(laststagewait - 1.5) 
 	endif
-	if !(Aggressor.GetActorRef())  ; already escape because some reason 
+	if !(Aggressor.GetActorRef())
+		AppUtil.Log("Aggr already escape because some reason " + SelfName)
 		return ; no handling, leave it to SexLab
 	endif
 	
@@ -426,7 +427,7 @@ EndEvent
 
 Function EndSexEvent(Actor aggr)
 	Actor selfact = self.GetActorRef()
-	if (EndlessSexLoop && PlayerActor.GetDistance(selfact) < YACR4NDistance.GetValue())
+	if (EndlessSexLoop && aggr && PlayerActor.GetDistance(selfact) < YACR4NDistance.GetValue())
 		AppUtil.Log("EndSexEvent, Goto to loop " + SelfName)
 		EndlessSexLoop = false
 		self._clearHelpers()
