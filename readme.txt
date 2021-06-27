@@ -53,9 +53,15 @@ SexLab Yet Another Combat Rape(SexLab YACR)のNPC版。
   ません。合致するアニメーションがない場合、行為は中断されます。この場合
   でも終了処理は正常に走ります。
 
+* 逆に人間4Pと5Pはレイプではなく合意アニメーションとして設定されていなけ
+  ればなりません。4P5Pはアニメーション数が少なく、他のModともアニメを共有
+  するためにこうしています。
+
 * エンドレスレイプをONにすると、攻撃を受けるまで止まりません。助けたい場
   合はレイパーを攻撃してください。攻撃したくない場合はエリアから離れて下
   さい。
+
+* YACRと違って「MCMに出ないニッチな設定」はありません。固定となります。
 
 
 ## 既知の問題
@@ -69,18 +75,16 @@ SexLab Yet Another Combat Rape(SexLab YACR)のNPC版。
 
 ## 必須
 
-* Skyrim OE + Dawnguard + Dragonborn
-* Skyrim SexLab 1.62
+* Skyrim LE or SE
+* Skyrim SexLab 1.62 or 1.63
 * SexLab Aroused Redux
 
 
 ## 製作環境で関係ありそうなModや設定
 
 * SexLab基本設定"Disable Starting Teleport"をOFFに
-* 戦闘関係はCombat Evolvedの設定値消去版だけ
+* Nether's Follower Framework 2.7.6
 * SexLabのシーン自体をフックするAdd On(SLSOとか)なし
-* Fresh Women Darkness
-* More Nasty Critters 11.1D
 
 
 ## 競合について
@@ -116,10 +120,16 @@ SaveTool.exeなどをその後にかけるとより安全です。
 
 ## 更新履歴
 
-### 2021/06/** - 1.1
+### 2021/06/** - 1.1 beta
 
-* SE用のこまごま処理
+* その他、SE用のこまごま処理、コード整理、小さなバグ修正
 * 設定ファイルのセーブ・ロード機能を追加
+* 発動時に出るピンクのパーティクルエフェクトを削除
+* ラグドール処理がおかしな状態になる対策コードの書き換え
+* Dripping when Aroused サポートを削除
+ (MCM以外にコードが全くありませんでした！どこでそうなったか不明)
+
+* 4P5Pのアニメ設定(レイプだとダメ)について自分でも覚えてなかったのでReadmeに追記
 
 
 ### 2019/01/24 - 1.0
